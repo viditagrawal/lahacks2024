@@ -29,17 +29,60 @@ import { KeyboardEvent, useRef, createContext, useContext, useEffect, useState }
 import Link from "next/link";
 
 import React from 'react';
-import ReactTypingEffect from 'react-typing-effect';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-import  { useDiagnosis } from '@/app/global'; 
+const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
+
+
+const generateResponse = async (userInput: string) => {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+  const prompt = "You are a doctor and I have a disease/illness. Give me 5 treatments for it, and then 5 symptoms of it. Respond in the format of the treatments first split by a hashtag character, then the symptoms split by a hashtag character.  I don't want numbers with the list and nothing else. An example response is \"# Topical corticosteroids # Corticosteroids injections # Immunotherapy # Minoxidil # Anthralin # # Sudden, round patches of hair loss # Smooth, round, bald patches # Itching or burning sensation # Exclamation mark hairs # Brittle nails #\". The disease is " + userInput;
+
+  console.log("Question Prompt: ", prompt);
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+  console.log(text);
+
+  return text;
+}
+
 
 // interface Message {
 //   message: String;
 //   type: "bot" | "user";
 // }
 
+interface TwoCardsProps {
+  treatmentsList: string[];
+  symptomList: string[];
+}
 
-const TwoCards = () => {
+const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
+
+  const renderBulletPoints = (items: string[] | undefined) => {
+    if (!Array.isArray(items)) {
+      // Handle empty or invalid items
+      return (
+        <ul className="list-disc pl-4">
+          <li className="text-gray-600">No items to display</li>
+        </ul>
+      );
+    }
+  
+    return (
+      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column-reverse' }}>
+          {items.map((item, index) => (
+            <li key={index} className="list-item text-gray-600 text-2xl">
+              {item}
+            </li>
+          ))}
+      </div>  
+    );
+  };
   return (
     <div className="flex justify-center items-end" style={
       {height: "50%", width: "100%"}
@@ -48,9 +91,11 @@ const TwoCards = () => {
       <div className="mr-4 h-full text-lg " style={
         {width: "40%"}}>
         <Card>
-          <div className="p-4">
-            <h2 className="text-3xl font-bold mb-2">Treatments:</h2>
-            <p className="text-gray-600">This is the content of Card 1.</p>
+          <div className="p-4 h-full">
+            <h2 className="text-3xl font-bold mb-2 text-center">Treatments</h2>
+            <div className="h-3"></div>
+            
+            {renderBulletPoints(treatmentsList)}
 
 
           </div>
@@ -61,9 +106,12 @@ const TwoCards = () => {
       <div className="ml-4 h-full text-lg" style={
         {width: "40%"}}>
         <Card>
-          <div className="p-4">
-            <h2 className="text-3xl font-bold mb-2">Symptoms:</h2>
-            <p className="text-gray-600">This is the content of Card 2.</p>
+          <div className="p-4 h-full">
+            <h2 className="text-3xl font-bold mb-2 text-center">Symptoms</h2>
+            <div className="h-3"></div>
+
+            {renderBulletPoints(symptomList)}
+
           </div>
         </Card>
       </div>
@@ -71,26 +119,73 @@ const TwoCards = () => {
   );
 };
 
+const parseResponse = (response: string) => {
+  const lines = response.split('#').map(line => line.trim());  
+
+  const treatmentsList: string[] = [];
+  const symptomsList: string[] = [];
+  let count = 0;
+  console.log("lines;" + lines);
+  lines.forEach(line => {
+    if (line.length > 2) {
+      if(count < 5){
+        treatmentsList.push(line);
+        count = count+1;
+      }
+      else{
+        symptomsList.push(line);
+      }
+    }
+  });
+
+
+  return { treatments: treatmentsList, symptoms: symptomsList };
+};
 
 export default function Diagnose() {
 
-  const[treatments, addTreatments] = useState({});
-  const[symptoms, addSymptoms] = useState({});
-
-
-  const { diagnosis } = useDiagnosis();
+  const[treatments, setTreatments] = useState<string[]>([]);
+  const[symptoms, setSymptoms] = useState<string[]>([]);
 
   useEffect(() => {
-    // Update diagnosis asynchronously after component has mounted
-    setDiagnosis("aidasdfadsfasas");
+    const fetchData = async () => {
+      try {
+        const response = await generateResponse();
+        console.log("Your response: " + response)
+        const { treatments: newTreatments, symptoms: newSymptoms } = parseResponse(response);
+
+        // Update treatments and symptoms state with new values
+
+        console.log(newTreatments)
+        console.log(newSymptoms)
+
+        setTreatments(newTreatments);
+        setSymptoms(newSymptoms);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Handle error if needed
+      }
+    };
+
+    fetchData();
   }, []);
-  console.log("hello!!");
+
   useEffect(() => {
-    console.log("Diagnosis updated:", diagnosis);
-  }, [diagnosis]);
+    // This effect will run whenever treatments or symptoms change
+    console.log('Updated treatments:', treatments);
+    console.log('Updated symptoms:', symptoms);
+  }, [treatments, symptoms]); // List dependencies: treatments and symptoms
+
+
+  // useEffect(() => {
+  //   // Update diagnosis asynchronously after component has mounted
+  // }, []);
+  // console.log("hello!!");
+  // useEffect(() => {
+  //   console.log("Diagnosis updated:", diagnosis);
+  // }, [diagnosis]);
 
   return (
-    <DiagnosisProvider>
     <main className="h-screen flex flex-col bg-background">
 
       {/* Header */}
@@ -154,7 +249,7 @@ export default function Diagnose() {
             <TypeAnimation
               sequence={[
                 // Same substring at the start will only be typed out once, initially
-                diagnosis,
+                "aiddsss",
                 1000,
 
               ]}
@@ -167,9 +262,8 @@ export default function Diagnose() {
 
       <div className="h-8"></div>
 
-      <TwoCards />
+      <TwoCards treatmentsList={treatments} symptomList={symptoms} />
 
     </main>
-    </DiagnosisProvider>
   );
 }
