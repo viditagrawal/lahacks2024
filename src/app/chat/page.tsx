@@ -18,8 +18,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useEffect, KeyboardEvent, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useMyContext } from "../providers";
 
 const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
@@ -30,10 +32,31 @@ interface Message {
 }
 
 export default function Chat() {
+  const router = useRouter();
   const scrollRef = useRef<null | HTMLDivElement>(null);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [userInput, setUserInput] = useState("");
   const [conversation, setConversation] = useState<Message[]>([]);
+
+  const {diag1, setDiag1} = useMyContext();
+  const {diag2, setDiag2} = useMyContext();
+  const {diagStory1, setDiagStory1} = useMyContext();
+  const {diagStory2, setDiagStory2} = useMyContext();
+
+
+  useEffect(() => {
+    const initialMessage = async () => {
+      try {
+        await addMessage({message: "Hello! My name is Nosie... Please write a quick story/summary of how you're feeling?", type: "bot" });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    
+
+    initialMessage();
+  }, []);
+
 
   const generateResponse = async (userInput: string) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
@@ -133,16 +156,20 @@ export default function Chat() {
         }
 
         const data = await response.json();
-        console.log('Received from server:', data);
+        console.log('Received from server:', data['diagnosis'], data['text']);
 
         if (!data['diagnosis']) { //prompt gemini ai for a question and then re-loop
           let response = await generateResponse(summary);
           console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
+        } else {
+          console.log("found diagnosis")
+
+          await setDiag1(data['diagnosis']);
+          if (router) {
+            router.push('/diag');
+          }
         }
-
-        return data;
-
       }
       catch (error) {
         console.error(error)
@@ -157,22 +184,8 @@ export default function Chat() {
     }
   };
 
-  useEffect(() => {
-    const initialMessage = async () => {
-      try {
-        await addMessage({message: "Hello! My name is Nosie... Please write a quick story/summary of how you're feeling?", type: "bot" });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    initialMessage();
-;
-  }, []);
-
   return (
     <main className="h-screen flex flex-col bg-background">
-
       {/* Header */}
       <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
         <div>
