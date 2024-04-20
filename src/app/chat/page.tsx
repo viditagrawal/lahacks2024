@@ -132,11 +132,11 @@ export default function Chat() {
 
       aiInput += "user: " + userInput + "\n";
 
-      console.log("aiInput: ", aiInput);
+      //console.log("aiInput: ", aiInput);
 
       let summary = await summarizeConversation(aiInput);
 
-      console.log(summary);
+      //console.log(summary);
 
       try {
         const endpoint = 'http://18.224.93.12:5000/fetch-response';
@@ -156,16 +156,17 @@ export default function Chat() {
         }
 
         const data = await response.json();
-        console.log('Received from server:', data['diagnosis'], data['text']);
+        //console.log('Received from server:', data['diagnosis'], data['text']);
 
         if (!data['diagnosis']) { //prompt gemini ai for a question and then re-loop
           let response = await generateResponse(summary);
-          console.log("More information needed");
+          //console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
         } else {
-          console.log("found diagnosis")
+          //console.log("found diagnosis")
 
           await setDiag1(data['diagnosis']);
+          await setDiagStory1(data['text']);
           if (router) {
             router.push('/diag');
           }
