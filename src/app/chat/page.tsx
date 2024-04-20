@@ -16,8 +16,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { KeyboardEvent, useRef, useState } from "react";
+import { useEffect, KeyboardEvent, useRef, useState } from "react";
 import Link from "next/link";
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
 
 interface Message {
   message: String;
@@ -30,8 +35,38 @@ export default function Chat() {
   const [userInput, setUserInput] = useState("");
   const [conversation, setConversation] = useState<Message[]>([]);
 
-  const addMessage = (message: Message) => {
-    setConversation((oldArray: Message[]) => [...oldArray, message]);
+  const generateResponse = async (userInput: string) => {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+    const prompt = "Analyze the provided patient narrative describing their symptoms and health experiences. Identify the critical aspects of their illness story. Generate a single, clear question aimed at obtaining specific additional details or context necessary for a more precise diagnosis. This question should directly probe into aspects such as symptom patterns, potential triggers, and impacts on daily activities. Return only the question without any prefixes or additional text. \n Summary: " + userInput;
+
+    console.log("Question Prompt: ", prompt);
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
+
+    return text;
+  }
+
+  const summarizeConversation = async (userInput: string) => {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+    const prompt = "Analyze the conversation below, paying close attention to the explicit details provided by the user about their health concerns. Summarize the key points mentioned, focusing strictly on the information shared without inferring additional details or context. Your response should directly reflect the user's statements, ensuring accuracy and adherence to the provided data. The summary should help clarify the user's experience in a straightforward manner, suitable for understanding the situation without adding any assumed information. Write it in the first-person perspective of the user." + " \n Conversation: \n" + userInput;
+    
+    console.log("Summary Prompt: ", prompt);
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text);
+
+    return text;
+  }
+
+  const addMessage = async(message: Message) => {
+    await setConversation((oldArray: Message[]) => [...oldArray, message]);
     if (message.type === "user") {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,18 +86,67 @@ export default function Chat() {
     }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (userInput) {
-      addMessage({ message: userInput, type: "user" });
+      await addMessage({ message: userInput, type: "user" });
       setUserInput(""); // clear the textarea
 
       // Here's is where you would put your request to the
       // chat bot server, a reply from the server should be
       // added using the function: addMessage({ message: "ok", type: "bot" });
       // for now we will only simulate the reply
-      setTimeout(() => {
-        addMessage({ message: "ok", type: "bot" });
-      }, (Math.floor(Math.random() * (15 - 10 + 1)) + 10) * 100);
+
+      let aiInput = "";
+
+      for (let i = 1; i < conversation.length; i++) {
+        const ign = "Hello!"
+        //if (conversation[i].type === "bot") {
+          if (!conversation[i].message.includes(ign)){
+          aiInput += conversation[i].type + ": " + conversation[i].message + "\n";
+          }
+        //}
+      }
+
+      aiInput += "user: " + userInput + "\n";
+
+      console.log("aiInput: ", aiInput);
+
+      let summary = await summarizeConversation(aiInput);
+
+      console.log(summary);
+
+      try {
+        const endpoint = 'http://18.224.93.12:5000/fetch-response';
+        const requestBody = {
+          message: summary
+        };
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestBody)
+        })
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Received from server:', data);
+
+        if (!data['diagnosis']) { //prompt gemini ai for a question and then re-loop
+          let response = await generateResponse(summary);
+          console.log("More information needed");
+          await addMessage({ message: response, type: "bot" });
+        }
+
+        return data;
+
+      }
+      catch (error) {
+        console.error(error)
+      }
     }
   };
 
@@ -72,6 +156,19 @@ export default function Chat() {
       sendMessage();
     }
   };
+
+  useEffect(() => {
+    const initialMessage = async () => {
+      try {
+        await addMessage({message: "Hello! My name is Nosie... Please write a quick story/summary of how you're feeling?", type: "bot" });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    initialMessage();
+;
+  }, []);
 
   return (
     <main className="h-screen flex flex-col bg-background">
@@ -103,58 +200,42 @@ export default function Chat() {
       </div>
 
       {/* Conversation */}
+
       <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
         <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
-          {conversation.map((msg, i) => {
-            return (
-              <div key={i} className="flex gap-2 first:mt-2">
-                {msg.type === "bot" && (
-                  <>
-                    {conversation[i - 1] &&
-                    conversation[i - 1].type === "bot" ? (
-                      <div className={`w-6 h-6`}></div>
-                    ) : (
-                      <Avatar className={`w-6 h-6 bg-background`}>
-                        <AvatarImage src="avatar/02.png" />
-                        <AvatarFallback>.ˍ.</AvatarFallback>
-                      </Avatar>
-                    )}
-                  </>
-                )}
-                <div
-                  className={`break-words whitespace-normal bg-white rounded-full border gap-2 m-4 px-4 py-3 text-md max-w-[60%] ${
-                    msg.type === "bot"
-                      ? "bg-white text-primary mr-auto"
-                      : "text-secondary bg-foreground ml-auto"
-                  } whitespace-pre-wrap `}
-                >
-                  {msg.message}
-                </div>
-                {msg.type === "user" && (
-                  <>
-                    {conversation[i - 1] &&
-                    conversation[i - 1].type === "user" ? (
-                      <div className={`w-6 h-6`}></div>
-                    ) : (
-                      <Avatar className={`w-6 h-6 bg-gray-200`}>
-                        <AvatarImage src="avatar/01.png" />
-                        <AvatarFallback>.ˍ.</AvatarFallback>
-                      </Avatar>
-                    )}
-                  </>
-                )}
+          {conversation.map((msg, i) => (
+            <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
+              <div
+                className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-md max-w-[60%] ${
+                  msg.type === 'bot' ? 'bg-white text-primary' : 'text-secondary bg-foreground'
+                }`}
+              >
+                {/* Avatar inside the bubble */}
+                {msg.type === 'bot' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                  <AvatarImage src={`avatar/02.png`} />
+                  <AvatarFallback></AvatarFallback>
+                </Avatar>}
+                
+                {/* Text inside the bubble */}
+                <span className="m-2 break-words overflow-hidden">{msg.message}</span>
+
+                {msg.type === 'user' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                  <AvatarImage src={`avatar/01.png`} />
+                  <AvatarFallback></AvatarFallback>
+                </Avatar>}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
         <div ref={messagesEndRef} className="mb-2"></div>
       </ScrollArea>
+
 
       {/* Chat input */}
       <div className="w-full sm:max-w-3xl mx-auto">
         <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
           <div className="p-4">
-            <div className="flex flex-row gap-3 p-4 border rounded-full">
+            <div className="flex flex-row gap-3 p-4 border rounded-xl">
               {/* <div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="outline-none">
