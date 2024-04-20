@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import React, { useState } from 'react';
 
 export const metadata: Metadata = {
   title: "diagNose",
