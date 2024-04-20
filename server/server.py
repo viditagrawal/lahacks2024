@@ -100,7 +100,14 @@ def post():
             "diagnosis": data[closest_story_index]["diagnosis"]
            }
 
+response = model.generate_content(
+            "You are a doctor that has expertise on various medical conditions. You need to extract a medical diagnosis from each recommendation below, and return only that scientific diagnosis and nothing else. If you cannot find a diagnosis, then say \"no response\"." +
+            "Example:\nRecommendation 1: \"This looks like alopecia areata. Please see a dermatologist for treatment\" \nRecomendation 2: \"If you’ve been drinking this much water for a long time, you are probably suffering from psychogenic polydipsia. This diagnosis is becoming increasingly common. It is not healthy to drink 5 gallons of water every day. That is more than 40 pounds of water, and more than 1/4 of your body weight every day. What that amount of water can do to your brain could lead to autonomic dysfunction that wouldn’t show up on tests, but might explain many of your symptoms. I would consider slowly tapering down to less than 1 gallon, while treating your dry mouth and “overheating” with more conservative measures (sialagogues such as lemon candy or gum, wearing cooler clothing). You will need behavioural therapy to assist with this. It is entirely treatable, but takes time. Here is a good case report—please see if this person’s symptoms don’t seem familiar\n Diagnosis 1: [alopecia areata]\nDiagnosis 2:  [psychogenic polydipsia]"
+            # Add Recommendation 1: "recomendation 1"\nRecomendation 2: "recomendation 2" ... :
+        )
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
