@@ -11,13 +11,13 @@ export default function Home() {
           Feeling sick?
         </p>
         <p className="mb-8 text-2xl">
-          No need to fear! Diagnose your illness with the help of other's stories.
+          No need to fear! Diagnose your illness with the help of others&apos; stories.
           <br />
-          Whatever you're feeling, <span style={{fontStyle:"italic"}}>someone has felt before too</span>.
+          Whatever you&apos;re feeling, <span style={{fontStyle:"italic"}}>someone has felt before too</span>.
         </p>
         <Link href="/chat" legacyBehavior>
           <a className="bg-primary hover:bg-secondary text-white text-xl font-bold py-3 px-4 rounded-full transition-colors">
-            Let's chat
+            Let&apos;s chat
           </a>
         </Link>
       </div>
