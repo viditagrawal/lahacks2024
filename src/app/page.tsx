@@ -2,20 +2,28 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen items-center justify-center p-24">
-      <div className="font-bold">
-        <Link href="https://github.com/deathg0d/next-chat" target="_blank">
-          deathg0d/next-chat
+    <main className="flex flex-row min-h-screen items-center justify-center p-24 text-center bg-gradient-to-r from-accent to-secondary">
+      <div className="flex-row justify-left text-left">
+        <h1 className="text-9xl font-bold mb-4">
+          <span className="text-primary">Diag<span style={{fontStyle:"italic"}}>nose</span></span>
+        </h1>
+        <p className="text-xl mb-8">
+          Feeling sick?
+        </p>
+        <p className="mb-8">
+          No need to fear! Diagnose your illness with the help of other's stories.
+          <br />
+          Whatever you're feeling, <span className="text-primary font-semibold">someone has felt before too</span>.
+        </p>
+        <Link href="/chat" legacyBehavior>
+          <a className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-full transition-colors">
+            Let's chat
+          </a>
         </Link>
       </div>
-      <div className="flex gap-1">
-        <span>Chat UI</span>
-        <Link
-          className="font-bold underline decoration-sky-500 decoration-2 hover:decoration-pink-500"
-          href="/chat"
-        >
-          here
-        </Link>
+      {/* Insert your SVG or image component for the logo here */}
+      <div className="ml-64">
+        <img src="/noseLogo.png" alt="Logo" />
       </div>
     </main>
   );

@@ -74,48 +74,35 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen flex flex-col bg-muted/50">
-      <div>
-        <div className="bg-white h-10 flex gap-3 items-center px-3">
-          <div>
-            <Link href="/">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M21 3l-5 9h5l-6.891 7.086a6.5 6.5 0 1 1 -8.855 -9.506l7.746 -6.58l-1 5l9 -5z" />
-                <path d="M9.5 14.5m-2.5 0a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0" />
-              </svg>
-            </Link>
-          </div>
-          <div className="flex-1"></div>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="outline-none">
-              <Avatar className="w-6 h-6 bg-gray-200">
-                <AvatarImage src="avatar/01.png" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" alignOffset={-5}>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <main className="h-screen flex flex-col bg-background">
+
+      {/* Header */}
+      <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
+        <div>
+          <Link href="/">
+            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+          </Link>
         </div>
-        <div className="shrink-0 bg-border h-[1px] w-full"></div>
+        <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="outline-none">
+            <Avatar className="w-6 h-6 bg-background">
+              <AvatarImage src="avatar/01.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" alignOffset={-5}>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Billing</DropdownMenuItem>
+            <DropdownMenuItem>Team</DropdownMenuItem>
+            <DropdownMenuItem>Subscription</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {/* Conversation */}
       <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
         <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
           {conversation.map((msg, i) => {
@@ -127,7 +114,7 @@ export default function Chat() {
                     conversation[i - 1].type === "bot" ? (
                       <div className={`w-6 h-6`}></div>
                     ) : (
-                      <Avatar className={`w-6 h-6 bg-gray-200`}>
+                      <Avatar className={`w-6 h-6 bg-background`}>
                         <AvatarImage src="avatar/02.png" />
                         <AvatarFallback>.ˍ.</AvatarFallback>
                       </Avatar>
@@ -135,7 +122,7 @@ export default function Chat() {
                   </>
                 )}
                 <div
-                  className={`max-w-[60%] flex flex-col ${
+                  className={`max-w-[60%] flex flex-col rounded ${
                     msg.type === "bot"
                       ? "bg-white mr-auto"
                       : "text-white bg-black ml-auto"
@@ -162,11 +149,13 @@ export default function Chat() {
         </div>
         <div ref={messagesEndRef} className="mb-2"></div>
       </ScrollArea>
+
+      {/* Chat input */}
       <div className="w-full sm:max-w-3xl mx-auto">
-        <div className="bg-white sm:rounded-t-md border-t sm:border shadow-lg">
+        <div className="bg-white rounded-t border-t sm:border shadow-lg">
           <div className="p-4">
-            <div className="flex flex-row gap-3 p-4 border rounded-t-md">
-              <div>
+            <div className="flex flex-row gap-3 p-4 border rounded">
+              {/* <div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="outline-none">
                     <div className="h-8 w-8 p-0 rounded-full shadow-sm border flex items-center justify-center">
@@ -182,10 +171,10 @@ export default function Chat() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
+              </div> */}
               <AutosizeTextarea
-                className="flex-1 outline-none border-0"
-                placeholder="Type here ..."
+                className="flex-1 bg-white outline-none border-0"
+                placeholder="Respond to Nosie..."
                 minHeight={25}
                 maxHeight={55}
                 rows={1}
@@ -193,7 +182,7 @@ export default function Chat() {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
               />
-              <Button onClick={() => sendMessage()} className="h-8 w-8 p-0">
+              <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 256 256"
