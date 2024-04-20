@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import ContextProvider from "./providers";
 
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
@@ -24,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-satoshi">
-        {children}
+        <ContextProvider>{children}</ContextProvider>
         </body>
     </html>
   );

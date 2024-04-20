@@ -1,8 +1,18 @@
 import Link from "next/link";
+import { useContext } from 'react';
+
+import ContextProvider from "./providers";
+import { useMyContext } from "./providers";
 
 export default function Home() {
+
+  const {diag1, setDiag1} = useMyContext();
+
+  console.log(diag1)
+
   return (
-    <main className="flex flex-row min-h-screen items-center justify-center p-24 text-center bg-gradient-to-r from-accent to-secondary">
+    <ContextProvider>
+      <main className="flex flex-row min-h-screen items-center justify-center p-24 text-center bg-gradient-to-r from-accent to-secondary">
       <div className="flex-row justify-left text-left">
         <h1 className="text-9xl font-bold mb-4">
           <span className="text-primary">Diag<span style={{fontStyle:"italic"}}>nose</span></span>
@@ -25,6 +35,7 @@ export default function Home() {
       <div className="ml-64">
         <img src="/noseLogo.png" alt="Logo" />
       </div>
-    </main>
+      </main>
+    </ContextProvider>
   );
 }
