@@ -58,11 +58,6 @@ def post():
     user_story = user_story['message'] # Decode request data from bytes to string
     # print("Received data:", user_story)  # Print received data for debugging
     
-
-        
-
-
-
     # call Gemini Endpoints2
     story_embed = getEmbedding(user_story)
 

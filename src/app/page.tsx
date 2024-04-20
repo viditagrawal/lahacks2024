@@ -7,16 +7,16 @@ export default function Home() {
         <h1 className="text-9xl font-bold mb-4">
           <span className="text-primary">Diag<span style={{fontStyle:"italic"}}>nose</span></span>
         </h1>
-        <p className="text-xl mb-8">
+        <p className="text-2xl mb-8">
           Feeling sick?
         </p>
-        <p className="mb-8">
+        <p className="mb-8 text-2xl">
           No need to fear! Diagnose your illness with the help of other's stories.
           <br />
-          Whatever you're feeling, <span className="text-primary font-semibold">someone has felt before too</span>.
+          Whatever you're feeling, <span style={{fontStyle:"italic"}}>someone has felt before too</span>.
         </p>
         <Link href="/chat" legacyBehavior>
-          <a className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded-full transition-colors">
+          <a className="bg-primary hover:bg-secondary text-white text-xl font-bold py-3 px-4 rounded-full transition-colors">
             Let's chat
           </a>
         </Link>
