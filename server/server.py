@@ -13,7 +13,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Initialize Firebase Admin SDK with service account credentials
 cred = credentials.Certificate("./diagnose-420905-firebase-adminsdk-i5i0w-2dacf5ac9d.json")  # Path to your service account key file
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://diagnose-420905-default-rtdb.firebaseio.com/'
+    'databaseURL': 'https://pathos-62a3b-default-rtdb.firebaseio.com/'
 })
 
 # Reference to your Firebase Realtime Database
