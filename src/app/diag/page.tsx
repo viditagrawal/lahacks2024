@@ -143,11 +143,9 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
 
 const ScrollArrow = () => {
     return (
-    <div>
-        <svg fill="#000000" height="50" width="50" viewBox="0 0 330 330">
+        <svg className="animate-bounce" fill="#2b8388"  height="50" width="50" viewBox="0 0 330 330">
             <path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
         </svg>
-    </div>
     );
   }
 
@@ -272,7 +270,7 @@ export default function Diagnose() {
             </div>
         </main>
 
-        <iframe className="m-auto w-4/5" src="http://projector.tensorflow.org/?config=https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/2a2c91d7f25e5959a7ace91eefe65ff70c187133/template_projector_config.json"/>
+        <iframe className="m-auto w-4/5 h-svh"src="http://projector.tensorflow.org/?config=https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/2a2c91d7f25e5959a7ace91eefe65ff70c187133/template_projector_config.json"/>
     </div>
   );
 }
