@@ -88,4 +88,12 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Abel';
+  src: url('/fonts/Abel-Regular.woff') format('woff');
+  /* Add additional src lines for other formats if needed */
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* Add more @font-face rules for other weights and styles as necessary */

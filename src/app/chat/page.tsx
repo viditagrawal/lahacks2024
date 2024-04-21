@@ -23,6 +23,8 @@ import { useRouter } from 'next/navigation';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useMyContext } from "../providers";
 
+
+
 const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
 
@@ -182,7 +184,7 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen flex flex-col bg-background">
+    <main className="h-screen flex flex-col bg-background" >
       {/* Header */}
       <div className="flex justify-between h-20 m-4 items-center">
         <div>
