@@ -270,7 +270,7 @@ export default function Diagnose() {
             </div>
         </main>
 
-        <iframe className="m-auto w-4/5 h-svh"src="http://projector.tensorflow.org/?config=https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/2a2c91d7f25e5959a7ace91eefe65ff70c187133/template_projector_config.json"/>
+        <iframe className="m-auto w-4/5 h-svh"src="https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/566cf82a9e4ee97a8c29ce545d41079b7c90c70f/template_projector_config.json"/>
     </div>
   );
 }
