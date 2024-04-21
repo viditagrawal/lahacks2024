@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <ContextProvider>
-      <main className="font-abel flex flex-col max-h-screen overflow-hidden items-center justify-start text-center bg-gradient-to-r from-accent to-secondary">
+      <main className="font-abel flex flex-col h-screen overflow-hidden items-center justify-start text-center bg-gradient-to-r from-accent to-secondary">
       <div className = "justify-start h-24 w-full">
         <img className = "flex w-16 h-16 m-8" src="/pathosLogo.png" alt="Logo"></img>
       </div>
@@ -32,7 +32,12 @@ export default function Home() {
           </Link>
         </div>
       {/* Insert your SVG or image component for the logo here */}
-        <img className = "w-min h-min m-8" src="/rain.png" alt="rain"></img>
+        <div  className = "flex justify-center w-full h-full">
+        <img className = "" src="/river.png" alt="river" style ={
+            {maxHeight:'100%',
+            width: 'auto'}
+        }></img>
+          </div>
       </div>
       </main>
     </ContextProvider>
