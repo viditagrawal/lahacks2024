@@ -1,6 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
  
 @layer base {
   :root {
@@ -86,14 +88,6 @@
   font-weight: 700;
   font-style: italic;
   font-display: swap;
-}
-
-@font-face {
-  font-family: 'Abel';
-  src: url('/fonts/Abel-Regular.woff') format('woff');
-  /* Add additional src lines for other formats if needed */
-  font-weight: normal;
-  font-style: normal;
 }
 
 /* Add more @font-face rules for other weights and styles as necessary */

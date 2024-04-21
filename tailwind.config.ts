@@ -19,7 +19,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        satoshi: ['"Satoshi"', 'sans-serif'],
+        satoshi: ['Satoshi', 'sans-serif'],
         abel: ["Abel", 'sans-serif'],
       },
       colors: {
