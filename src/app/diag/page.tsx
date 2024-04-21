@@ -104,12 +104,15 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
       {height: "50%", width: "100%"}
     }>
       {/* First Card */}
-      <div className="mr-4 h-full text-lg " style={
+      <div className="mr-4 h-full text-lg drop-shadow-xl" style={
         {width: "40%"}}>
         <Card>
           <div className="p-4 h-full">
-            <h2 className="text-3xl font-bold mb-2 text-center">Treatments</h2>
-            <div className="h-3"></div>
+            <h2 className="text-3xl font-bold mb-2 text-center  ">Treatments</h2>
+            <div className="h-3 flex justify-center mb-2">
+              <h3 className="w-80 h-1 border-color border-2 "> </h3>
+
+            </div>
             
             {renderBulletPoints(treatmentsList)}
 
@@ -119,12 +122,15 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
       </div>
 
       {/* Second Card */}
-      <div className="ml-4 h-full text-lg" style={
+      <div className="ml-4 h-full text-lg drop-shadow-xl" style={
         {width: "40%"}}>
         <Card>
           <div className="p-4 h-full">
             <h2 className="text-3xl font-bold mb-2 text-center">Symptoms</h2>
-            <div className="h-3"></div>
+            <div className="h-3 flex justify-center mb-2">
+              <h3 className="w-80 h-1 border-color border-2 "> </h3>
+
+            </div>
 
             {renderBulletPoints(symptomList)}
 
@@ -134,6 +140,14 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
     </div>
   );
 };
+
+const ScrollArrow = () => {
+    return (
+        <svg className="animate-bounce" fill="#2b8388"  height="50" width="50" viewBox="0 0 330 330">
+            <path d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
+        </svg>
+    );
+  }
 
 const parseResponse = (response: string) => {
   const lines = response.split('#').map(line => line.trim());  
@@ -208,68 +222,55 @@ export default function Diagnose() {
   // }, [diagnosis]);
 
   return (
-    <main className="h-screen flex flex-col bg-background">
+    <div>
+        <main className="h-screen flex flex-col bg-background">
 
-      {/* Header */}
-      <div className="flex justify-between h-20 m-4 items-center">
-        <div>
-          <Link href="/">
-            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
-          </Link>
-        </div>
-      </div>
-      <div className="h-8"></div>
-      <div className="h-8"></div>
-      <div className="h-8"></div>
-      <div className="content-end flex bg-background p-6 justify-center flex-end">
+            {/* Header */}
+            <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
+                <div>
+                <Link href="/">
+                    <img className = "w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo" />
+                </Link>
+                </div>
+            </div>
+            <div className="content-end flex bg-background p-2 justify-center flex-end">
 
-
-      {/* <ReactTypingEffect
-        text={["You most likely have... "]}
-        eraseSpeed={0}
-        cursorRenderer={cursor => <h1>{cursor}</h1>}
-        eraseDelay={10000000000000000000000000000000000000000}
-        displayTextRenderer={(text, i) => {
-          return (
-            <h1>
-              {text.split('').map((char, i) => {
-                const key = `${i}`;
-                return (
-                  <span
-                    key={key}
-                    style={i%2 === 0 ? { color: 'magenta'} : {}}
-                  >{char}</span>
-                );
-              })}
-            </h1>
-          );
-        }}        
-      /> */}
-
-
-        <div className="text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
-          <p>you most likely have... </p>
-        </div>
-          <div className="text-3xl md:text-3xl lg:text-6xl text-center text-primary">
-            <TypeAnimation
-              sequence={[
-                // Same substring at the start will only be typed out once, initially
-                diag1,
-                1000,
-
-              ]}
-              speed={30}
-              repeat={Infinity}
-              cursor={false}
-            />
-          </div>
+            <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
+            <p>you most likely have... </p>
+            </div>
         
-      </div>
+            <div className = "p-2 rounded-3xl border-2 border-color">
+            <div className="text-3xl md:text-3xl lg:text-6xl text-center text-primary box-border">
+                <TypeAnimation
+                sequence={[
+                    // Same substring at the start will only be typed out once, initially
+                    diag1,
+                    1000,
 
-      <div className="h-8"></div>
+                ]}
+                speed={30}
+                repeat={Infinity}
+                cursor={false}
+                />
+            </div>
+            </div>
+            </div>
 
-      <TwoCards treatmentsList={treatments} symptomList={symptoms} />
+            <div className="h-8"></div>
+            <div className="h-8"></div>
+            <div className="h-8"></div>
+            
+            <TwoCards treatmentsList={treatments} symptomList={symptoms} />
 
-    </main>
+            <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
+            <div className="flex justify-center space-x-5 mt-28">
+                <p>scroll to see a graph of all story embeddings, and their corresponding diagnoses</p>
+                {ScrollArrow()}
+            </div>
+            </div>
+        </main>
+
+        <iframe className="m-auto w-4/5 h-svh" src="http://projector.tensorflow.org/?config=https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/67ad33a064eec2b2586d0554d8fd044c591d0b0c/template_projector_config.json"/>
+    </div>
   );
 }
