@@ -196,11 +196,11 @@ export default function Chat() {
 
       <div className="h-screen flex flex-col bg-background w-full p-4">
         <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-          <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
+          <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto">
             {conversation.map((msg, i) => (
               <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
                 <div
-                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-md max-w-[60%] ${
+                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] ${
                     msg.type === 'bot' ? 'bg-white text-primary' : 'text-secondary bg-foreground'
                   }`}
                 >
@@ -225,7 +225,7 @@ export default function Chat() {
         </ScrollArea>
 
         {/* Chat input */}
-        <div className="w-full sm:max-w-3xl mx-auto">
+        <div className="min-w-[70%] sm:max-w-3xl mx-auto">
           <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
             <div className="p-4">
               <div className="flex flex-row gap-3 p-4 border rounded-xl">
@@ -247,7 +247,7 @@ export default function Chat() {
                   </DropdownMenu>
                 </div> */}
                 <AutosizeTextarea
-                  className="flex-1 bg-white outline-none border-0 text-md"
+                  className="flex-1 bg-white outline-none border-0 text-2xl"
                   placeholder="Respond to Nosie..."
                   minHeight={25}
                   maxHeight={55}

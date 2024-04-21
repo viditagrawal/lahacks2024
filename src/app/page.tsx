@@ -17,16 +17,16 @@ export default function Home() {
           <h1 className="text-9xl font-bold mb-4">
             <span className="text-primary">Pathos</span>
           </h1>
-          <p className="text-2xl mb-8">
+          <p className="text-3xl mb-8">
             Feeling sick?
           </p>
-          <p className="mb-8 text-2xl">
+          <p className="mb-8 text-3xl">
             No need to fear! Diagnose your illness with the help of others&apos; stories.
             <br />
             Whatever you&apos;re feeling, <span style={{fontStyle:"italic"}}>someone has felt before too</span>.
           </p>
           <Link href="/chat" legacyBehavior>
-            <a className="bg-primary hover:bg-secondary text-white text-xl font-bold py-3 px-4 rounded-full w-28 transition-colors">
+            <a className="bg-primary hover:bg-secondary hover:text-foreground text-white text-3xl font-bold py-3 px-4 rounded-full w-max transition-colors">
               Let&apos;s chat
             </a>
           </Link>
