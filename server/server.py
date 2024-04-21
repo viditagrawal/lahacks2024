@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 # Initialize Firebase Admin SDK with service account credentials
-cred = credentials.Certificate("./diagnose-420905-firebase-adminsdk-i5i0w-2dacf5ac9d.json")  # Path to your service account key file
+cred = credentials.Certificate("./pathos-62a3b-firebase-adminsdk-pcops-3ed4107d73.json")  # Path to your service account key file
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://diagnose-420905-default-rtdb.firebaseio.com/'
+    'databaseURL': 'https://pathos-62a3b-default-rtdb.firebaseio.com/'
 })
 
 # Reference to your Firebase Realtime Database
@@ -56,8 +56,9 @@ def post():
     #get embeddings for text
     # print("Request method:", request.method)
     # print("Request data:", request.data)  # Print raw request data
-    user_story = request.get_json()
-    user_story = user_story['message'] # Decode request data from bytes to string
+    user_story = request.get_json()['message'] # Decode request data from bytes to string
+    count = request.get_json().get('count', 1) # 1 is the default value
+
     # print("Received data:", user_story)  # Print received data for debugging
     
     # call Gemini Endpoints2
@@ -65,42 +66,54 @@ def post():
 
 
     #get top story in database (make different diag)
-    closest_story_index = 0
-    for ii in range(1, len(data)):
-        previous_score = cosine_similarity(story_embed, data[closest_story_index]["embedding"])[0][0]
-        current_score = cosine_similarity(story_embed, data[ii]["embedding"])[0][0]
-        print(f"previous_score {previous_score}")
-        print(f"current_score {current_score}")
-        if previous_score < current_score:
-            closest_story_index = ii
-        
-    #return json of stories
-         
-    # print("HELLO ", data[closest_story_index])
-            
+    cosine_similarities = []
+    for ii in range(2, len(data)):
+        cosine_similarities.append((cosine_similarity(story_embed, data[ii]["embedding"])[0][0], ii))
+    
+    cosine_similarities.sort(key=lambda x : -x[0])
+
+    most_similar_stories = []
+    pos = 0
+    seen_diagnoses = set()
+    while len(most_similar_stories) < count and pos < len(cosine_similarities):
+        idx = cosine_similarities[pos][1]
+        diagnosis = data[idx]['diagnosis'].lower()
+        if diagnosis not in seen_diagnoses:
+            seen_diagnoses.add(diagnosis)
+            most_similar_stories.append(cosine_similarities[pos])
+        pos += 1
+    
     # the following code will be used by the frontend to ask for more info if the best diagnosis is innacurate
     embedding_cuttoff = 0.75
-    if cosine_similarity(story_embed, data[closest_story_index]["embedding"])[0][0] < embedding_cuttoff:
-        # TODO: Change the string below to something the UI can understand, maybe an error message
+    if most_similar_stories[0][0] < embedding_cuttoff:
         return {
-            # "text": data[closest_story_index]["text"],
             "diagnosis": None
            }
         
-        
+    result = {}
+
+    for ii, (_, idx) in enumerate(most_similar_stories):
+        comment_url = data[idx]['comments'][0]['url']
+        post_url = comment_url[:comment_url.rfind('/', 0, -2)]
+        result[ii] = {
+            "text": data[idx]['text'],
+            "diagnosis": data[idx]['diagnosis'],
+            "post_url": post_url
+        }
+
     # add new story to database
     if prod:
         new_db_entry = {
             "text": user_story,
             "embedding" : story_embed,
-            "diagnosis" : data[closest_story_index]["diagnosis"]
+            "diagnosis" : result[0]["diagnosis"]
         }
         write_result_to_db(new_db_entry)
 
-    return {
-            # "text": data[closest_story_index]["text"],
-            "diagnosis": data[closest_story_index]["diagnosis"]
-           }
+    # backwards compatibility
+    if count == 1:
+        return result[0]
+    return result
 
 
 

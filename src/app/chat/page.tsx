@@ -173,14 +173,11 @@ export default function Chat() {
           },
           body: JSON.stringify(requestBody)
         })
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const data = await response.json();
         //console.log('Received from server:', data['diagnosis'], data['text']);
-
         if (!data['diagnosis']) { //prompt gemini ai for a question and then re-loop
           let response = await generateResponse(summary);
           //console.log("More information needed");
@@ -214,31 +211,14 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen flex flex-col bg-background">
+    <main className="h-screen w-full flex flex-col justify-center items-center bg-background">
       {/* Header */}
-      <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
+      <div className="flex flex-col items-center">
         <div>
           <Link href="/">
-            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
-        <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="outline-none">
-            <Avatar className="w-6 h-6 bg-background">
-              <AvatarImage src="avatar/01.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" alignOffset={-5}>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Conversation */}
@@ -275,49 +255,49 @@ export default function Chat() {
         <div ref={messagesEndRef} className="mb-2"></div>
       </ScrollArea>
 
-
-      {/* Chat input */}
-      <div className="w-full sm:max-w-3xl mx-auto">
-        <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
-          <div className="p-4">
-            <div className="flex flex-row gap-3 p-4 border rounded-xl">
-              {/* <div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="outline-none">
-                    <div className="h-8 w-8 p-0 rounded-full shadow-sm border flex items-center justify-center">
-                      <PlusIcon className="h-4 w-4" />
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" alignOffset={-10}>
-                    <DropdownMenuLabel>More options</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Reset</DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Attach <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div> */}
-              <AutosizeTextarea
-                className="flex-1 bg-white outline-none border-0 text-md"
-                placeholder="Respond to Nosie..."
-                minHeight={25}
-                maxHeight={55}
-                rows={1}
-                onKeyDown={(e) => handleEnter(e)}
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-              />
-              <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 256"
-                  fill="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
-                </svg>
-              </Button>
+        {/* Chat input */}
+        <div className="min-w-[70%] sm:max-w-3xl mx-auto">
+          <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
+            <div className="p-4">
+              <div className="flex flex-row gap-3 p-4 border rounded-xl">
+                {/* <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="outline-none">
+                      <div className="h-8 w-8 p-0 rounded-full shadow-sm border flex items-center justify-center">
+                        <PlusIcon className="h-4 w-4" />
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" alignOffset={-10}>
+                      <DropdownMenuLabel>More options</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>Reset</DropdownMenuItem>
+                      <DropdownMenuItem>
+                        Attach <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div> */}
+                <AutosizeTextarea
+                  className="flex-1 bg-white outline-none border-0 text-2xl"
+                  placeholder="Respond to Nosie..."
+                  minHeight={25}
+                  maxHeight={55}
+                  rows={1}
+                  onKeyDown={(e) => handleEnter(e)}
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                />
+                <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 256 256"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
+                    <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
+                  </svg>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

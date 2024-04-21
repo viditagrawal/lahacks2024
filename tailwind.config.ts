@@ -19,7 +19,14 @@ const config = {
     },
     extend: {
       fontFamily: {
-        satoshi: ['"Satoshi"', 'sans-serif'],
+        satoshi: ['Satoshi', 'sans-serif'],
+        abel: ["Abel", 'sans-serif'],
+      },
+      fontSize: {
+        sm: '1rem', // Small text size
+        base: '1.15rem', // Base text size
+        lg: '1.50rem', // Large text size
+        xl: '1.70rem', // Extra large text size
       },
       colors: {
         border: "hsl(var(--border))",
