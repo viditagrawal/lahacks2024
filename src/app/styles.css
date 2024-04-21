@@ -1,0 +1,18 @@
+
+.titleBox {
+    --s: 50px; /* the size on the corner */
+    --t: 5px;  /* the thickness of the border */
+    --g: 10px; /* the gap between the border and image */
+    
+    padding: calc(var(--g) + var(--t));
+    outline: var(--t) solid rgb(104, 204, 205); /* the color here */
+    outline-offset: calc(-1*var(--t));
+    mask:
+      conic-gradient(at var(--s) var(--s),#0000 75%,#000 0)
+      0 0/calc(100% - var(--s)) calc(100% - var(--s)),
+      linear-gradient(#000 0 0) content-box;
+    transition: .4s;
+  }
+  .titleBox:hover {
+    outline-offset: calc(var(--g)/-1);
+  }

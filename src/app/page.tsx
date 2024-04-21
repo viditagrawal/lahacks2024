@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useContext } from 'react';
 import Head from "next/head";
+import "./styles.css"
 
 import ContextProvider from "./providers";
 
@@ -14,9 +15,12 @@ export default function Home() {
       </div>
       <div className="flex flex-row overflow-hidden">
         <div className="flex flex-col justify-left text-left p-24">
-          <h1 className="text-9xl font-bold mb-4">
-            <span className="text-primary">Pathos</span>
-          </h1>
+          <div className = "flex justify-left">
+          <div className = "flex justify-center text-centertitleBox mb-6">
+            <h1 className="titleBox text-9xl font-bold">
+              <span className="text-primary">Pathos</span>
+            </h1></div></div>
+          
           <p className="text-3xl mb-8">
             Feeling sick?
           </p>
