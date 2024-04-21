@@ -34,6 +34,10 @@ interface Message {
   embed?: string;
 }
 
+type PastStories = {
+  [key: string]: number;
+};
+
 export default function Chat() {
   const router = useRouter();
   const scrollRef = useRef<null | HTMLDivElement>(null);
@@ -47,7 +51,7 @@ export default function Chat() {
   const {diagStory2, setDiagStory2} = useMyContext();
   const [shownStoryIds, setShownStoryIds] = useState(new Set());
   const [diagReady, setDiagStatus] = useState(false);
-  const [pastStories, setPastStories] = useState({});
+  const [pastStories, setPastStories] = useState<PastStories>({});
   const [mostRecentStory, setMostRecentStory] = useState("");
   const [summaryReady, setSummaryReady] = useState(false);
 
@@ -134,7 +138,7 @@ export default function Chat() {
     return null;
   };
 
-  const addStoryToConversation = async (data, summary) => {
+  const addStoryToConversation = async (data: any, summary: string) => {
     if (!shownStoryIds.has(data.post_url)) {
       // Story ID not shown before, display it
       await setMostRecentStory(data["text"]);
@@ -148,7 +152,11 @@ export default function Chat() {
       }
       await addMessage({ message: data.text, type: "bot" });
       await addMessageWithRedditEmbed({ message: "", type: "bot" }, data.post_url);
-      await setShownStoryIds(prev => new Set([...prev, data.post_url]));  // Add to shown IDs
+      await setShownStoryIds(prev => {
+        const newSet = new Set(prev); // Create a new Set based on the previous one
+        newSet.add(data.post_url);   // Add the new URL
+        return newSet;               // Return the updated Set
+      });
     } else {
       // Story ID has been shown before, fetch another or handle accordingly
       console.log("Story already shown, fetching a new one or skipping...");
@@ -256,7 +264,7 @@ export default function Chat() {
     }
   };
 
-  const updateDictionary = async (key, shouldIncrement) => {
+  const updateDictionary = async (key:string, shouldIncrement:any) => {
     let temp = await Number(shouldIncrement)
     console.log("UPDATE DICT: ", key, shouldIncrement)
     await setPastStories(pastStories => ({

@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 
-function RedditEmbed({ post_url }) {
+interface RedditEmbedProps {
+    post_url: string;  // Correctly declaring the type of `post_url`
+}
+function RedditEmbed( { post_url }: RedditEmbedProps ) {
   useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://embed.reddit.com/widgets.js";
@@ -16,7 +19,7 @@ function RedditEmbed({ post_url }) {
   return (
     <React.Fragment>
       <blockquote className="reddit-embed-bq" style={{height: "200px"}}>
-        <a href={post_url}></a>
+        <a href={post_url}>{post_url}</a>
       </blockquote>
     </React.Fragment>
   );
