@@ -4,10 +4,11 @@ import json
 # Define the JSON data to be sent in the POST request
 data = {
     "message": """I have a cough"""
+    # "count": 2
 }
 
 # Define the URL of the API endpoint
-url = 'http://127.0.0.1:5000/stuff'
+url = 'http://127.0.0.1:5000/fetch-response'
 
 # Set the headers for the request (specifying content type as JSON)
 headers = {
