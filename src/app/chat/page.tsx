@@ -52,11 +52,12 @@ export default function Chat() {
   useEffect(() => {
     const initialMessage = async () => {
       try {
-        await addMessage({
-          message:
-            "Hello! My name is Nosie... Please write a quick story/summary of how you're feeling?",
-          type: "bot",
-        });
+        setTimeout(() =>  {
+          addMessage({
+            message:
+              "Hello! My name is Nosie... Please write a quick story/summary of how you're feeling?",
+            type: "bot",
+          });}, 1000)
       } catch (error) {
         console.log(error);
       }
@@ -284,9 +285,9 @@ export default function Chat() {
 
       {/* Conversation */}
 
-      <div className={`pt-32 h-screen min-w-[70%] mx-auto flex flex-col bg-background p-4`}>
-        <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-          <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto pb-32">
+      <div className={`pt-32 h-screen min-w-[70%] justify-center flex flex-col bg-background p-4`}>
+        <ScrollArea ref={scrollRef}>
+          <div className="flex flex-col gap-1 p-2 pb-32">
             {conversation.map((msg, i) => (
               <div
                 key={i}
@@ -297,8 +298,8 @@ export default function Chat() {
                 <div
                   className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg m-2 ${
                     msg.type === "bot"
-                      ? "bg-white text-primary"
-                      : "text-secondary bg-foreground"
+                      ? "bg-white text-primary ml-56"
+                      : "text-secondary bg-foreground mr-56"
                   }`}
                 >
                   {/* Avatar inside the bubble */}
