@@ -214,7 +214,7 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen w-full flex flex-col justify-center bg-background">
+    <main className="max-h-screen overflow-hidden w-full flex flex-col justify-center bg-background">
       {/* Header */}
       <div className="flex flex-col sticky top-0">
         <div className="bg-background min-w-full">
