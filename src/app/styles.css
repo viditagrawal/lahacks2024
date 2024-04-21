@@ -5,7 +5,7 @@
     --g: 10px; /* the gap between the border and image */
     
     padding: calc(var(--g) + var(--t));
-    outline: var(--t) solid rgb(104, 204, 205); /* the color here */
+    outline: var(--t) solid #2b8388; /* the color here */
     outline-offset: calc(-1*var(--t));
     mask:
       conic-gradient(at var(--s) var(--s),#0000 75%,#000 0)

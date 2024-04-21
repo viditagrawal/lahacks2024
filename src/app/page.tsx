@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <ContextProvider>
-      <main className="font-abel flex flex-col h-screen overflow-hidden items-center justify-start text-center bg-gradient-to-r from-accent to-secondary">
+      <main className="font-abel flex flex-col h-screen overflow-hidden items-center justify-start text-center bg-gradient-to-r from-accent to-primary">
       <div className = "justify-start h-24 w-full">
         <img className = "flex w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo"></img>
       </div>
