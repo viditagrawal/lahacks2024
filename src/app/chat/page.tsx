@@ -317,7 +317,7 @@ export default function Chat() {
       <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
         <div className="bg-background">
           <Link href="/">
-            <img className="w-24 h-24 m-6" src="/pathosLogo.png" alt="Logo" />
+            <img className="w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
         <div className="m-6 justify-end">
