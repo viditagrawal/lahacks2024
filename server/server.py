@@ -69,28 +69,36 @@ def post():
     cosine_similarities = []
     for ii in range(2, len(data)):
         cosine_similarities.append((cosine_similarity(story_embed, data[ii]["embedding"])[0][0], ii))
-        
-    #return json of stories
-
+    
     cosine_similarities.sort(key=lambda x : -x[0])
 
-
-    most_similar_stories = cosine_similarities[:count]
+    most_similar_stories = []
+    pos = 0
+    seen_diagnoses = set()
+    while len(most_similar_stories) < count and pos < len(cosine_similarities):
+        idx = cosine_similarities[pos][1]
+        diagnosis = data[idx]['diagnosis'].lower()
+        if diagnosis not in seen_diagnoses:
+            seen_diagnoses.add(diagnosis)
+            most_similar_stories.append(cosine_similarities[pos])
+        pos += 1
+    
     # the following code will be used by the frontend to ask for more info if the best diagnosis is innacurate
     embedding_cuttoff = 0.75
     if most_similar_stories[0][0] < embedding_cuttoff:
-        # TODO: Change the string below to something the UI can understand, maybe an error message
         return {
-            # "text": data[closest_story_index]["text"],
             "diagnosis": None
            }
         
     result = {}
 
-    for ii, (cos_sim, idx) in enumerate(most_similar_stories):
+    for ii, (_, idx) in enumerate(most_similar_stories):
+        comment_url = data[idx]['comments'][0]['url']
+        post_url = comment_url[:comment_url.rfind('/', 0, -2)]
         result[ii] = {
             "text": data[idx]['text'],
-            "diagnosis": data[idx]['diagnosis']
+            "diagnosis": data[idx]['diagnosis'],
+            "post_url": post_url
         }
 
     # add new story to database
@@ -102,6 +110,9 @@ def post():
         }
         write_result_to_db(new_db_entry)
 
+    # backwards compatibility
+    if count == 1:
+        return result[0]
     return result
 
 
