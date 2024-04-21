@@ -56,8 +56,9 @@ def post():
     #get embeddings for text
     # print("Request method:", request.method)
     # print("Request data:", request.data)  # Print raw request data
-    user_story = request.get_json()
-    user_story = user_story['message'] # Decode request data from bytes to string
+    user_story = request.get_json()['message'] # Decode request data from bytes to string
+    count = request.get_json().get('count', 1) # 1 is the default value
+
     # print("Received data:", user_story)  # Print received data for debugging
     
     # call Gemini Endpoints2
@@ -65,42 +66,43 @@ def post():
 
 
     #get top story in database (make different diag)
-    closest_story_index = 0
-    for ii in range(1, len(data)):
-        previous_score = cosine_similarity(story_embed, data[closest_story_index]["embedding"])[0][0]
-        current_score = cosine_similarity(story_embed, data[ii]["embedding"])[0][0]
-        print(f"previous_score {previous_score}")
-        print(f"current_score {current_score}")
-        if previous_score < current_score:
-            closest_story_index = ii
+    cosine_similarities = []
+    for ii in range(2, len(data)):
+        cosine_similarities.append((cosine_similarity(story_embed, data[ii]["embedding"])[0][0], ii))
         
     #return json of stories
-         
-    # print("HELLO ", data[closest_story_index])
-            
+
+    cosine_similarities.sort(key=lambda x : -x[0])
+
+
+    most_similar_stories = cosine_similarities[:count]
     # the following code will be used by the frontend to ask for more info if the best diagnosis is innacurate
     embedding_cuttoff = 0.75
-    if cosine_similarity(story_embed, data[closest_story_index]["embedding"])[0][0] < embedding_cuttoff:
+    if most_similar_stories[0][0] < embedding_cuttoff:
         # TODO: Change the string below to something the UI can understand, maybe an error message
         return {
             # "text": data[closest_story_index]["text"],
             "diagnosis": None
            }
         
-        
+    result = {}
+
+    for ii, (cos_sim, idx) in enumerate(most_similar_stories):
+        result[ii] = {
+            "text": data[idx]['text'],
+            "diagnosis": data[idx]['diagnosis']
+        }
+
     # add new story to database
     if prod:
         new_db_entry = {
             "text": user_story,
             "embedding" : story_embed,
-            "diagnosis" : data[closest_story_index]["diagnosis"]
+            "diagnosis" : result[0]["diagnosis"]
         }
         write_result_to_db(new_db_entry)
 
-    return {
-            # "text": data[closest_story_index]["text"],
-            "diagnosis": data[closest_story_index]["diagnosis"]
-           }
+    return result
 
 
 
