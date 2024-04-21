@@ -45,6 +45,7 @@ export default function Chat() {
   const {diag2, setDiag2} = useMyContext();
   const {diagStory1, setDiagStory1} = useMyContext();
   const {diagStory2, setDiagStory2} = useMyContext();
+  const [diagReady, setDiagStatus] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -221,9 +222,11 @@ export default function Chat() {
           );
           await setDiag1(data["diagnosis"]);
           await setDiagStory1(data["text"]);
-          if (router) {
-            // router.push('/diag');
-          }
+            
+          await setDiagStatus(true);
+          await setLoading(false);
+
+
         }
       } catch (error) {
         console.error(error);
@@ -238,22 +241,52 @@ export default function Chat() {
     }
   };
 
+  const handleDiagButton = () => {
+    console.log(diagReady);
+
+    if (diagReady) {
+      return (
+        <Link href="/diag" legacyBehavior>
+            <Button onClick = {() => router.push('/diag')} className={`text-3xl rounded p-5 bg-primary text-white font-bold transition-colors
+                        ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl 
+                        transition transform animate-bounce hover:bg-secondary 
+                          hover:text-foreground hover:scale-110 hover:-translate-y-1`}>
+              Get Diagnosis
+            </Button>
+          </Link>
+      )
+    }
+    else {
+      return (
+          <Button 
+          disabled = {true}
+          className="text-3xl rounded p-5 bg-primary text-white font-bold transition-colors
+          ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl">
+                Get Diagnosis
+          </Button>
+      )
+    }
+  }
+
   return (
     <main className="max-h-screen overflow-hidden w-full flex flex-col justify-center bg-background">
       {/* Header */}
-      <div className="flex flex-col sticky top-0">
-        <div className="bg-background min-w-full">
+      <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
+        <div className="bg-background">
           <Link href="/">
-            <img className="w-16 h-16 m-6" src="/pathosLogo.png" alt="Logo" />
+            <img className="w-24 h-24 m-6" src="/pathosLogo.png" alt="Logo" />
           </Link>
+        </div>
+        <div className="m-6 justify-end">
+          {handleDiagButton()}
         </div>
       </div>
 
       {/* Conversation */}
 
-      <div className="h-screen flex flex-col bg-background w-full p-4">
+      <div className={` ${diagReady ? 'pt-32' : 'pt-0' } h-screen flex flex-col bg-background w-full p-4`}>
         <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-          <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto">
+          <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto pb-32">
             {conversation.map((msg, i) => (
               <div
                 key={i}
@@ -262,7 +295,7 @@ export default function Chat() {
                 } items-end`}
               >
                 <div
-                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg ${
+                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg m-2 ${
                     msg.type === "bot"
                       ? "bg-white text-primary"
                       : "text-secondary bg-foreground"
@@ -293,7 +326,7 @@ export default function Chat() {
       </div>
 
         {/* Chat input */}
-        <div className="min-w-[70%] sm:max-w-3xl mx-auto">
+        <div className="min-w-[70%] sm:max-w-3xl mx-auto fixed bottom-0 left-0 right-0">
           <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
             <div className="p-4">
               <div className="flex flex-row gap-3 p-4 border rounded-xl items-center">
