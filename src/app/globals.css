@@ -89,3 +89,10 @@
 }
 
 /* Add more @font-face rules for other weights and styles as necessary */
+.embed-content {
+  max-width: 100%;        /* Limits the width to the parent container's width */
+  max-height: 200px;      /* Sets a maximum height for the embed */
+  overflow: auto;         /* Adds scrollbars if the content overflows */
+  border: 1px solid #ccc; /* Optional: Adds a border around the embed */
+  border-radius: 8px;     /* Optional: Rounds the corners of the embed */
+}

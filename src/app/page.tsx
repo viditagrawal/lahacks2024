@@ -2,13 +2,8 @@ import Link from "next/link";
 import { useContext } from 'react';
 
 import ContextProvider from "./providers";
-import { useMyContext } from "./providers";
 
 export default function Home() {
-
-  const {diag1, setDiag1} = useMyContext();
-
-  console.log(diag1)
 
   return (
     <ContextProvider>
