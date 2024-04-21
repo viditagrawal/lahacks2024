@@ -208,7 +208,7 @@ export default function Chat() {
                   }`}
                 >
                   {/* Avatar inside the bubble */}
-                  {msg.type === 'bot' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                  {msg.type === 'bot' && <Avatar className="w-6 h-6 m-3 shrink-0">
                     <AvatarImage src={`avatar/02.png`} />
                     <AvatarFallback></AvatarFallback>
                   </Avatar>}
@@ -216,7 +216,7 @@ export default function Chat() {
                   {/* Text inside the bubble */}
                   <span className="m-2 break-words overflow-hidden">{msg.message}</span>
 
-                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-3 shrink-0">
                     <AvatarImage src={`avatar/01.png`} />
                     <AvatarFallback></AvatarFallback>
                   </Avatar>}
