@@ -226,10 +226,10 @@ export default function Diagnose() {
         <main className="h-screen flex flex-col bg-background">
 
             {/* Header */}
-            <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
+            <div className="flex justify-between h-20 m-4 items-center">
                 <div>
                 <Link href="/">
-                    <img className = "w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo" />
+                    <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
                 </Link>
                 </div>
             </div>
@@ -263,14 +263,14 @@ export default function Diagnose() {
             <TwoCards treatmentsList={treatments} symptomList={symptoms} />
 
             <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
-            <div className="flex justify-center space-x-5 mt-6">
+            <div className="flex justify-center space-x-5 mt-28">
                 <p>scroll to see a graph of all story embeddings, and their corresponding diagnoses</p>
                 {ScrollArrow()}
             </div>
             </div>
         </main>
 
-        <iframe className="m-auto w-4/5 h-svh"src="https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/566cf82a9e4ee97a8c29ce545d41079b7c90c70f/template_projector_config.json"/>
+        <iframe className="m-auto w-4/5 h-svh" src="http://projector.tensorflow.org/?config=https://gist.githubusercontent.com/kylebkumar/3aeb08fca2552acca5a9fb9c3ac73202/raw/67ad33a064eec2b2586d0554d8fd044c591d0b0c/template_projector_config.json"/>
     </div>
   );
 }
