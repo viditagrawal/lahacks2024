@@ -214,12 +214,12 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen w-full flex flex-col justify-center items-center bg-background">
+    <main className="h-screen w-full flex flex-col justify-center bg-background">
       {/* Header */}
-      <div className="flex flex-col items-center">
-        <div>
+      <div className="flex flex-col sticky top-0">
+        <div className="bg-background min-w-full">
           <Link href="/">
-            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
+            <img className = "w-16 h-16 m-6" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
       </div>
@@ -248,7 +248,7 @@ export default function Chat() {
                 ) : (
                   <span className="m-2 break-words overflow-hidden">{msg.message}</span>)}
 
-                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-3 shrink-0">
                     <AvatarImage src={`avatar/01.png`} />
                     <AvatarFallback></AvatarFallback>
                   </Avatar>}
