@@ -11,7 +11,7 @@ export default function Home() {
     <ContextProvider>
       <main className="font-abel flex flex-col h-screen overflow-hidden items-center justify-start text-center bg-gradient-to-r from-accent to-secondary">
       <div className = "justify-start h-24 w-full">
-        <img className = "flex w-16 h-16 m-8" src="/pathosLogo.png" alt="Logo"></img>
+        <img className = "flex w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo"></img>
       </div>
       <div className="flex flex-row overflow-hidden">
         <div className="flex flex-col justify-left text-left p-24">
