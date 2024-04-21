@@ -77,29 +77,12 @@ export default function Chat() {
     <main className="h-screen flex flex-col bg-background">
 
       {/* Header */}
-      <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
+      <div className="flex justify-between h-20 m-4 items-center">
         <div>
           <Link href="/">
-            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
-        <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="outline-none">
-            <Avatar className="w-6 h-6 bg-background">
-              <AvatarImage src="avatar/01.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" alignOffset={-5}>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Conversation */}

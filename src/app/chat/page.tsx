@@ -150,21 +150,17 @@ export default function Chat() {
           },
           body: JSON.stringify(requestBody)
         })
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
         const data = await response.json();
         //console.log('Received from server:', data['diagnosis'], data['text']);
-
         if (!data['diagnosis']) { //prompt gemini ai for a question and then re-loop
           let response = await generateResponse(summary);
           //console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
         } else {
           //console.log("found diagnosis")
-
           await setDiag1(data['diagnosis']);
           await setDiagStory1(data['text']);
           if (router) {
@@ -188,29 +184,12 @@ export default function Chat() {
   return (
     <main className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
+      <div className="flex justify-between h-20 m-4 items-center">
         <div>
           <Link href="/">
-            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
-        <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="outline-none">
-            <Avatar className="w-6 h-6 bg-background">
-              <AvatarImage src="avatar/01.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" alignOffset={-5}>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       {/* Conversation */}
