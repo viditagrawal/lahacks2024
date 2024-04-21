@@ -79,10 +79,21 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
     }
   
     return (
-      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column-reverse' }}>
+      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column' }}>
           {items.map((item, index) => (
+
             <li key={index} className="list-item text-gray-600 text-2xl">
-              {item}
+              <TypeAnimation
+              sequence={[
+                // Same substring at the start will only be typed out once, initially
+                500 * (index),
+                item,
+                1000,
+              ]}
+              speed={30}
+              repeat={Infinity}
+              cursor = {false}
+            />
             </li>
           ))}
       </div>  
@@ -93,12 +104,15 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
       {height: "50%", width: "100%"}
     }>
       {/* First Card */}
-      <div className="mr-4 h-full text-lg " style={
+      <div className="mr-4 h-full text-lg drop-shadow-xl" style={
         {width: "40%"}}>
         <Card>
           <div className="p-4 h-full">
-            <h2 className="text-3xl font-bold mb-2 text-center">Treatments</h2>
-            <div className="h-3"></div>
+            <h2 className="text-3xl font-bold mb-2 text-center  ">Treatments</h2>
+            <div className="h-3 flex justify-center mb-2">
+              <h3 className="w-80 h-1 border-color border-2 "> </h3>
+
+            </div>
             
             {renderBulletPoints(treatmentsList)}
 
@@ -108,12 +122,15 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
       </div>
 
       {/* Second Card */}
-      <div className="ml-4 h-full text-lg" style={
+      <div className="ml-4 h-full text-lg drop-shadow-xl" style={
         {width: "40%"}}>
         <Card>
           <div className="p-4 h-full">
             <h2 className="text-3xl font-bold mb-2 text-center">Symptoms</h2>
-            <div className="h-3"></div>
+            <div className="h-3 flex justify-center mb-2">
+              <h3 className="w-80 h-1 border-color border-2 "> </h3>
+
+            </div>
 
             {renderBulletPoints(symptomList)}
 
@@ -207,10 +224,7 @@ export default function Diagnose() {
           </Link>
         </div>
       </div>
-      <div className="h-8"></div>
-      <div className="h-8"></div>
-      <div className="h-8"></div>
-      <div className="content-end flex bg-background p-6 justify-center flex-end">
+      <div className="content-end flex bg-background p-2 justify-center flex-end">
 
 
       {/* <ReactTypingEffect
@@ -235,11 +249,12 @@ export default function Diagnose() {
         }}        
       /> */}
 
-
-        <div className="text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
+        <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
           <p>you most likely have... </p>
         </div>
-          <div className="text-3xl md:text-3xl lg:text-6xl text-center text-primary">
+     
+        <div className = "p-2 rounded-3xl border-2 border-color">
+          <div className="text-3xl md:text-3xl lg:text-6xl text-center text-primary box-border">
             <TypeAnimation
               sequence={[
                 // Same substring at the start will only be typed out once, initially
@@ -249,13 +264,16 @@ export default function Diagnose() {
               ]}
               speed={30}
               repeat={Infinity}
+              cursor={false}
             />
           </div>
-        
+        </div>
       </div>
 
       <div className="h-8"></div>
-
+      <div className="h-8"></div>
+      <div className="h-8"></div>
+      
       <TwoCards treatmentsList={treatments} symptomList={symptoms} />
 
     </main>

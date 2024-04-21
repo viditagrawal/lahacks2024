@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-
+import RedditEmbed from "./RedditEmbed";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useEffect, KeyboardEvent, useRef, useState } from "react";
@@ -29,6 +29,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KE
 interface Message {
   message: String;
   type: "bot" | "user";
+  embed?: string;
 }
 
 export default function Chat() {
@@ -109,6 +110,28 @@ export default function Chat() {
       }
     }
   };
+  
+  const addMessageWithRedditEmbed = async (message: Message, embedHtml: string) => {
+    const newMessage = { ...message, embed: embedHtml };
+    await setConversation((oldArray: Message[]) => [...oldArray, newMessage]);
+  
+    if (message.type === 'user') {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const messageEndPosition = messagesEndRef.current?.getBoundingClientRect()?.top || 0;
+      const scrollAreaPosition = scrollRef.current?.getBoundingClientRect()?.top || 0;
+      const scrollAreaHeight = scrollRef.current?.clientHeight || 0;
+      const scrollPosition = messageEndPosition - scrollAreaPosition;
+      if (scrollAreaHeight - scrollPosition >= -200) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  };
+
 
   const sendMessage = async () => {
     if (userInput) {
@@ -164,10 +187,16 @@ export default function Chat() {
           await setLoading(false);
         } else {
           //console.log("found diagnosis")
+          //show story or diagnosis
+          await addMessage({ message: "Oh wow! There is a similar experience that another patient has faced that may be worth checking out in order to figure out what kind of disease you have: \n " + data['text'], type: "bot" });
+          await addMessage({ message: "Here is a reddit post that might be helpful: \n ", type: "bot" });
+          console.log(data);
+
+          await addMessageWithRedditEmbed({ message: "Please let me know if this helps", type: "bot" }, data['post_url']);
           await setDiag1(data['diagnosis']);
           await setDiagStory1(data['text']);
           if (router) {
-            router.push('/diag');
+            // router.push('/diag');
           }
         }
       }
@@ -203,7 +232,7 @@ export default function Chat() {
             {conversation.map((msg, i) => (
               <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
                 <div
-                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] ${
+                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg ${
                     msg.type === 'bot' ? 'bg-white text-primary' : 'text-secondary bg-foreground'
                   }`}
                 >
@@ -214,9 +243,12 @@ export default function Chat() {
                   </Avatar>}
                   
                   {/* Text inside the bubble */}
-                  <span className="m-2 break-words overflow-hidden">{msg.message}</span>
+                  {msg.embed ? (
+                  <RedditEmbed post_url={msg.embed}/>
+                ) : (
+                  <span className="m-2 break-words overflow-hidden">{msg.message}</span>)}
 
-                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-3 shrink-0">
+                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-2 shrink-0">
                     <AvatarImage src={`avatar/01.png`} />
                     <AvatarFallback></AvatarFallback>
                   </Avatar>}
@@ -226,6 +258,7 @@ export default function Chat() {
           </div>
           <div ref={messagesEndRef} className="mb-2"></div>
         </ScrollArea>
+      </div>
 
         {/* Chat input */}
         <div className="min-w-[70%] sm:max-w-3xl mx-auto">
@@ -286,12 +319,10 @@ export default function Chat() {
                       d="M12 4v1M16.24 7.76l-0.7 0.7M20 12h-1M16.24 16.24l-0.7-0.7M12 20v-1M7.76 16.24l0.7-0.7M4 12h1M7.76 7.76l0.7 0.7" />
                   </svg>
                 </Button>}
-
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
   );
 }
