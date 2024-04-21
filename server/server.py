@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 # Initialize Firebase Admin SDK with service account credentials
-cred = credentials.Certificate("./pathos-62a3b-firebase-adminsdk-pcops-3ed4107d73.json")  # Path to your service account key file
+cred = credentials.Certificate("./diagnose-420905-firebase-adminsdk-i5i0w-2dacf5ac9d.json")  # Path to your service account key file
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://pathos-62a3b-default-rtdb.firebaseio.com/'
+    'databaseURL': 'https://diagnose-420905-default-rtdb.firebaseio.com/'
 })
 
 # Reference to your Firebase Realtime Database
@@ -58,6 +58,9 @@ def post():
     # print("Request data:", request.data)  # Print raw request data
     user_story = request.get_json()['message'] # Decode request data from bytes to string
     count = request.get_json().get('count', 1) # 1 is the default value
+    pastUrls = request.get_json().get('pastUrls', [])
+
+    pastSet = set(pastUrls)
 
     # print("Received data:", user_story)  # Print received data for debugging
     
@@ -74,12 +77,12 @@ def post():
 
     most_similar_stories = []
     pos = 0
-    seen_diagnoses = set()
     while len(most_similar_stories) < count and pos < len(cosine_similarities):
         idx = cosine_similarities[pos][1]
         diagnosis = data[idx]['diagnosis'].lower()
-        if diagnosis not in seen_diagnoses:
-            seen_diagnoses.add(diagnosis)
+        comment_url = data[idx]['comments'][0]['url']
+        post_url = comment_url[:comment_url.rfind('/', 0, -2)]
+        if post_url not in pastSet:
             most_similar_stories.append(cosine_similarities[pos])
         pos += 1
     

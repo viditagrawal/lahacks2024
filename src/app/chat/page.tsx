@@ -47,6 +47,11 @@ export default function Chat() {
   const {diagStory2, setDiagStory2} = useMyContext();
   const [shownStoryIds, setShownStoryIds] = useState(new Set());
   const [diagReady, setDiagStatus] = useState(false);
+  const [pastStories, setPastStories] = useState({});
+  const [mostRecentStory, setMostRecentStory] = useState("");
+  const [summaryReady, setSummaryReady] = useState(false);
+
+  const [globalSummary, setSummary] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -84,9 +89,55 @@ export default function Chat() {
     return text;
   };
 
+  const calculateSentiment = async (userInput: string) => {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const prompt =
+      "You are given a user's response to how much they relate to a story. Return 1 if the user agrees and relates to the story and 0 if the user disagrees and does not relate to the story. \n Response: " +
+      userInput; 
+
+    console.log("Question Prompt: ", prompt);
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log("TEXT: ", text);
+
+    return text;
+  };
+
+  const calculateMaxDiagnose = async (userInput: string) => {
+    console.log("Calculating max diag: " + userInput);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    if (userInput !== '{}') {
+      const prompt =
+      "Given a dictionary where each entry is a diagnosis with its corresponding count, please identify and return the name of the diagnosis that has the highest total count after grouping similar entries. The response should be the name of the diagnosis only, without any counts or additional data." + 
+        "\n Dictionary: " + userInput; 
+
+      // console.log("Question Prompt: ", prompt);
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      console.log("FINAL DISEASE: ", text);
+
+      await setDiag1(text);
+      router.push("/diag");
+
+      return text;
+    }
+
+      router.push("/diag");
+    // console.log(text);
+    return null;
+  };
+
   const addStoryToConversation = async (data, summary) => {
     if (!shownStoryIds.has(data.post_url)) {
       // Story ID not shown before, display it
+      await setMostRecentStory(data["text"]);
       if(shownStoryIds.size == 0)
       {
         await addMessage({ message: "I hope you feel better soon! Someone else had a very similar story to yours where you might be able to find some help.", type: "bot" });
@@ -97,15 +148,17 @@ export default function Chat() {
       }
       await addMessage({ message: data.text, type: "bot" });
       await addMessageWithRedditEmbed({ message: "", type: "bot" }, data.post_url);
-      setShownStoryIds(prev => new Set([...prev, data.post_url]));  // Add to shown IDs
+      await setShownStoryIds(prev => new Set([...prev, data.post_url]));  // Add to shown IDs
     } else {
       // Story ID has been shown before, fetch another or handle accordingly
       console.log("Story already shown, fetching a new one or skipping...");
+      console.log(Array.from(shownStoryIds));
       try {
           const endpoint = 'http://18.224.93.12:5000/fetch-response';
           const requestBody = {
             message: summary,
-            count: shownStoryIds.size+1,
+            pastUrls: Array.from(shownStoryIds),
+            count: 1,
           };
           const response = await fetch(endpoint, {
             method: 'POST',
@@ -151,7 +204,7 @@ export default function Chat() {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log(text);
+    console.log("SUMMARY: ", text);
 
     return text;
   };
@@ -202,17 +255,23 @@ export default function Chat() {
       }
     }
   };
+
+  const updateDictionary = async (key, shouldIncrement) => {
+    let temp = await Number(shouldIncrement)
+    console.log("UPDATE DICT: ", key, shouldIncrement)
+    await setPastStories(pastStories => ({
+      ...pastStories,
+      [key]: key in pastStories ? (temp == 1 ? pastStories[key] + 1 : pastStories[key] - 1) : (temp == 1 ? 1 : -1),
+    }));
+  };
+
   
   const sendMessage = async () => {
+    console.log(pastStories);
     if (userInput) {
       await setLoading(true);
       await addMessage({ message: userInput, type: "user" });
-      setUserInput(""); // clear the textarea
-
-      // Here's is where you would put your request to the
-      // chat bot server, a reply from the server should be
-      // added using the function: addMessage({ message: "ok", type: "bot" });
-      // for now we will only simulate the reply
+      await setUserInput(""); // clear the textarea
 
       let aiInput = "";
 
@@ -228,9 +287,18 @@ export default function Chat() {
 
       aiInput += "user: " + userInput + "\n";
 
-      //console.log("aiInput: ", aiInput);
+      if (mostRecentStory !== "") {
+        let sentiment = await calculateSentiment(userInput);
+        await updateDictionary(diag1, sentiment);
+        await setMostRecentStory("");
+      }
 
-      let summary = await summarizeConversation(aiInput);
+      let summary = globalSummary;
+      if (globalSummary == ""){
+        summary = await summarizeConversation(aiInput);
+      }
+
+      // console.log("SUMMARY: ", summary);
 
       //console.log(summary);
 
@@ -238,6 +306,7 @@ export default function Chat() {
         const endpoint = "http://18.224.93.12:5000/fetch-response";
         const requestBody = {
           message: summary,
+          pastUrls: Array.from(shownStoryIds),
           count: 1,
         };
         const response = await fetch(endpoint, {
@@ -253,12 +322,19 @@ export default function Chat() {
         const data = await response.json();
         //console.log('Received from server:', data['diagnosis'], data['text']);
         if (!data["diagnosis"]) {
+          if (summaryReady) {
+            let finalDiagnosis = await calculateMaxDiagnose(JSON.stringify(pastStories));
+          }
           //prompt gemini ai for a question and then re-loop
           let response = await generateResponse(summary);
           //console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
           await setLoading(false);
         } else {
+          await setSummaryReady(true);
+          if (globalSummary == ""){
+            await setSummary(summary);
+          }
           //console.log("found diagnosis")
           //show story or diagnosis
           if (data && data.post_url) {
@@ -285,18 +361,16 @@ export default function Chat() {
   };
 
   const handleDiagButton = () => {
-    console.log(diagReady);
+    // console.log(diagReady);
 
     if (diagReady) {
       return (
-        <Link href="/diag" legacyBehavior>
-            <Button onClick = {() => router.push('/diag')} className={`text-3xl rounded p-5 bg-primary text-white font-bold transition-colors
-                        ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl 
-                        transition transform animate-bounce hover:bg-secondary 
-                          hover:text-foreground hover:scale-110 hover:-translate-y-1`}>
-              Get Diagnosis
-            </Button>
-          </Link>
+          <Button onClick = {() => calculateMaxDiagnose(JSON.stringify(pastStories))} className={`text-3xl rounded p-5 bg-primary text-white font-bold transition-colors
+                      ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl 
+                      transition transform animate-bounce hover:bg-secondary 
+                        hover:text-foreground hover:scale-110 hover:-translate-y-1`}>
+            Get Diagnosis
+          </Button>
       )
     }
     else {
@@ -338,7 +412,7 @@ export default function Chat() {
                 } items-end`}
               >
                 <div
-                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg m-2 ${
+                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[45%] drop-shadow-lg m-2 ${
                     msg.type === "bot"
                       ? "bg-white text-primary ml-56"
                       : "text-secondary bg-foreground mr-56"

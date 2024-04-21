@@ -4,11 +4,12 @@ import json
 # Define the JSON data to be sent in the POST request
 data = {
     "message": """I have a cough""",
-    "count": 10
+    "pastUrls": ["https://www.reddit.com/r/AskDocs/comments/nwz3od/i_have_to_cough_for_some_reason", "https://www.reddit.com/r/AskDocs/comments/zih3gl/i_have_an_annoying_cough"],
+    "count": 1
 }
 
 # Define the URL of the API endpoint
-url = 'http://127.0.0.1:5000/fetch-response'
+url = 'http://18.224.93.12:5000/fetch-response'
 
 # Set the headers for the request (specifying content type as JSON)
 headers = {
