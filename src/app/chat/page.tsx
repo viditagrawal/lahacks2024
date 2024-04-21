@@ -223,23 +223,24 @@ export default function Chat() {
 
       {/* Conversation */}
 
-      <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-        <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
-          {conversation.map((msg, i) => (
-            <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
-              <div
-                className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-md max-w-[60%] ${
-                  msg.type === 'bot' ? 'bg-white text-primary' : 'text-secondary bg-foreground'
-                }`}
-              >
-                {/* Avatar inside the bubble */}
-                {msg.type === 'bot' && <Avatar className="w-6 h-6 m-2 shrink-0">
-                  <AvatarImage src={`avatar/02.png`} />
-                  <AvatarFallback></AvatarFallback>
-                </Avatar>}
-                
-                {/* Text inside the bubble */}
-                {msg.embed ? (
+      <div className="h-screen flex flex-col bg-background w-full p-4">
+        <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
+          <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto">
+            {conversation.map((msg, i) => (
+              <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
+                <div
+                  className={`flex flex-row break-words rounded-3xl border px-4 py-2 text-2xl max-w-[60%] drop-shadow-lg ${
+                    msg.type === 'bot' ? 'bg-white text-primary' : 'text-secondary bg-foreground'
+                  }`}
+                >
+                  {/* Avatar inside the bubble */}
+                  {msg.type === 'bot' && <Avatar className="w-6 h-6 m-2 shrink-0">
+                    <AvatarImage src={`avatar/02.png`} />
+                    <AvatarFallback></AvatarFallback>
+                  </Avatar>}
+                  
+                  {/* Text inside the bubble */}
+                  {msg.embed ? (
                   <RedditEmbed post_url={msg.embed}/>
                 ) : (
                   <span className="m-2 break-words overflow-hidden">{msg.message}</span>
