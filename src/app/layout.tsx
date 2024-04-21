@@ -3,9 +3,11 @@ import ContextProvider from "./providers";
 
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import "@fontsource/abel";
+import React, { useState } from 'react';
 
 export const metadata: Metadata = {
-  title: "diagNose",
+  title: "Pathos",
   description: "Get your symptoms diagnosed with the help of a community",
 };
 
@@ -23,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-satoshi">
+      <body className="font-abel">
         <ContextProvider>{children}</ContextProvider>
         </body>
     </html>

@@ -80,7 +80,7 @@ export default function Chat() {
       <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
         <div>
           <Link href="/">
-            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+            <img className = "w-10 h-10 m-1" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
         <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>

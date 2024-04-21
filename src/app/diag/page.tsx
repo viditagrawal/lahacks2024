@@ -11,191 +11,253 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TypeAnimation } from 'react-type-animation';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PlusIcon } from "@radix-ui/react-icons";
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useRef, createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Message {
-  message: String;
-  type: "bot" | "user";
+import React from 'react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+import { useMyContext } from "../providers";
+
+
+
+const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
+
+
+const generateResponse = async (userInput: string) => {
+  const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+
+  const prompt = "You are a doctor and I have a disease/illness. Give me 5 treatments for it, and then 5 symptoms of it. Respond in the format of the treatments first split by a hashtag character, then the symptoms split by a hashtag character.  I don't want numbers with the list and nothing else. An example response is \"# Topical corticosteroids # Corticosteroids injections # Immunotherapy # Minoxidil # Anthralin # # Sudden, round patches of hair loss # Smooth, round, bald patches # Itching or burning sensation # Exclamation mark hairs # Brittle nails #\". The disease is " + userInput;
+
+  console.log("Question Prompt: ", prompt);
+
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  const text = response.text();
+
+  console.log(text);
+
+  return text;
 }
 
-export default function Chat() {
-  const scrollRef = useRef<null | HTMLDivElement>(null);
-  const messagesEndRef = useRef<null | HTMLDivElement>(null);
-  const [userInput, setUserInput] = useState("");
-  const [conversation, setConversation] = useState<Message[]>([]);
 
-  const addMessage = (message: Message) => {
-    setConversation((oldArray: Message[]) => [...oldArray, message]);
-    if (message.type === "user") {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    } else {
-      const messageEndPosition =
-        messagesEndRef.current?.getBoundingClientRect()?.top || 0;
-      const scrollAreaPosition =
-        scrollRef.current?.getBoundingClientRect()?.top || 0;
-      const scrollAreaHeight = scrollRef.current?.clientHeight || 0;
-      const scrollPosition = messageEndPosition - scrollAreaPosition;
-      if (scrollAreaHeight - scrollPosition >= -200) {
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+// interface Message {
+//   message: String;
+//   type: "bot" | "user";
+// }
+
+interface TwoCardsProps {
+  treatmentsList: string[];
+  symptomList: string[];
+}
+
+const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
+
+  const renderBulletPoints = (items: string[] | undefined) => {
+    if (!Array.isArray(items)) {
+      // Handle empty or invalid items
+      return (
+        <ul className="list-disc pl-4">
+          <li className="text-gray-600">No items to display</li>
+        </ul>
+      );
+    }
+  
+    return (
+      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column-reverse' }}>
+          {items.map((item, index) => (
+            <li key={index} className="list-item text-gray-600 text-2xl">
+              {item}
+            </li>
+          ))}
+      </div>  
+    );
+  };
+  return (
+    <div className="flex justify-center items-end" style={
+      {height: "50%", width: "100%"}
+    }>
+      {/* First Card */}
+      <div className="mr-4 h-full text-lg " style={
+        {width: "40%"}}>
+        <Card>
+          <div className="p-4 h-full">
+            <h2 className="text-3xl font-bold mb-2 text-center">Treatments</h2>
+            <div className="h-3"></div>
+            
+            {renderBulletPoints(treatmentsList)}
+
+
+          </div>
+        </Card>
+      </div>
+
+      {/* Second Card */}
+      <div className="ml-4 h-full text-lg" style={
+        {width: "40%"}}>
+        <Card>
+          <div className="p-4 h-full">
+            <h2 className="text-3xl font-bold mb-2 text-center">Symptoms</h2>
+            <div className="h-3"></div>
+
+            {renderBulletPoints(symptomList)}
+
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+const parseResponse = (response: string) => {
+  const lines = response.split('#').map(line => line.trim());  
+
+  const treatmentsList: string[] = [];
+  const symptomsList: string[] = [];
+  let count = 0;
+  console.log("lines;" + lines);
+  lines.forEach(line => {
+    if (line.length > 2) {
+      if(count < 5){
+        treatmentsList.push(line);
+        count = count+1;
+      }
+      else{
+        symptomsList.push(line);
       }
     }
-  };
+  });
 
-  const sendMessage = () => {
-    if (userInput) {
-      addMessage({ message: userInput, type: "user" });
-      setUserInput(""); // clear the textarea
 
-      // Here's is where you would put your request to the
-      // chat bot server, a reply from the server should be
-      // added using the function: addMessage({ message: "ok", type: "bot" });
-      // for now we will only simulate the reply
-      setTimeout(() => {
-        addMessage({ message: "ok", type: "bot" });
-      }, (Math.floor(Math.random() * (15 - 10 + 1)) + 10) * 100);
-    }
-  };
+  return { treatments: treatmentsList, symptoms: symptomsList };
+};
 
-  const handleEnter = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
+export default function Diagnose() {
+
+  const {diag1, setDiag1} = useMyContext();
+  const {diag2, setDiag2} = useMyContext();
+  const {diagStory1, setDiagStory1} = useMyContext();
+  const {diagStory2, setDiagStory2} = useMyContext();
+
+  const[treatments, setTreatments] = useState<string[]>([]);
+  const[symptoms, setSymptoms] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+
+        const response = await generateResponse(diag1);
+        console.log("Your response: " + response)
+        const { treatments: newTreatments, symptoms: newSymptoms } = parseResponse(response);
+
+        // Update treatments and symptoms state with new values
+
+        console.log(newTreatments)
+        console.log(newSymptoms)
+
+        setTreatments(newTreatments);
+        setSymptoms(newSymptoms);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Handle error if needed
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // This effect will run whenever treatments or symptoms change
+    console.log('Updated treatments:', treatments);
+    console.log('Updated symptoms:', symptoms);
+  }, [treatments, symptoms]); // List dependencies: treatments and symptoms
+
+
+  // useEffect(() => {
+  //   // Update diagnosis asynchronously after component has mounted
+  // }, []);
+  // console.log("hello!!");
+  // useEffect(() => {
+  //   console.log("Diagnosis updated:", diagnosis);
+  // }, [diagnosis]);
 
   return (
     <main className="h-screen flex flex-col bg-background">
 
       {/* Header */}
-      <div className="flex justify-between bg-white h-16 gap-3 items-center px-3">
+      <div className="flex justify-between h-20 m-4 items-center">
         <div>
           <Link href="/">
-            <img className = "w-10 h-10 m-1" src="/noseLogo.png" alt="Logo" />
+            <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
-        <h1 className="text-5xl font-bold text-primary">Diagnosis</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger className="outline-none">
-            <Avatar className="w-6 h-6 bg-background">
-              <AvatarImage src="avatar/01.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" alignOffset={-5}>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
+      <div className="h-8"></div>
+      <div className="h-8"></div>
+      <div className="h-8"></div>
+      <div className="content-end flex bg-background p-6 justify-center flex-end">
 
-      {/* Conversation */}
-      <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-        <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
-          {conversation.map((msg, i) => {
-            return (
-              <div key={i} className="flex gap-2 first:mt-2">
-                {msg.type === "bot" && (
-                  <>
-                    {conversation[i - 1] &&
-                    conversation[i - 1].type === "bot" ? (
-                      <div className={`w-6 h-6`}></div>
-                    ) : (
-                      <Avatar className={`w-6 h-6 bg-background`}>
-                        <AvatarImage src="avatar/02.png" />
-                        <AvatarFallback>.ˍ.</AvatarFallback>
-                      </Avatar>
-                    )}
-                  </>
-                )}
-                <div
-                  className={`break-words whitespace-normal bg-white rounded-full border gap-2 m-4 px-4 py-3 text-md max-w-[60%] ${
-                    msg.type === "bot"
-                      ? "bg-white text-primary mr-auto"
-                      : "text-secondary bg-foreground ml-auto"
-                  } whitespace-pre-wrap `}
-                >
-                  {msg.message}
-                </div>
-                {msg.type === "user" && (
-                  <>
-                    {conversation[i - 1] &&
-                    conversation[i - 1].type === "user" ? (
-                      <div className={`w-6 h-6`}></div>
-                    ) : (
-                      <Avatar className={`w-6 h-6 bg-gray-200`}>
-                        <AvatarImage src="avatar/01.png" />
-                        <AvatarFallback>.ˍ.</AvatarFallback>
-                      </Avatar>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })}
+
+      {/* <ReactTypingEffect
+        text={["You most likely have... "]}
+        eraseSpeed={0}
+        cursorRenderer={cursor => <h1>{cursor}</h1>}
+        eraseDelay={10000000000000000000000000000000000000000}
+        displayTextRenderer={(text, i) => {
+          return (
+            <h1>
+              {text.split('').map((char, i) => {
+                const key = `${i}`;
+                return (
+                  <span
+                    key={key}
+                    style={i%2 === 0 ? { color: 'magenta'} : {}}
+                  >{char}</span>
+                );
+              })}
+            </h1>
+          );
+        }}        
+      /> */}
+
+
+        <div className="text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
+          <p>you most likely have... </p>
         </div>
-        <div ref={messagesEndRef} className="mb-2"></div>
-      </ScrollArea>
+          <div className="text-3xl md:text-3xl lg:text-6xl text-center text-primary">
+            <TypeAnimation
+              sequence={[
+                // Same substring at the start will only be typed out once, initially
+                diag1,
+                1000,
 
-      {/* Chat input */}
-      <div className="w-full sm:max-w-3xl mx-auto">
-        <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
-          <div className="p-4">
-            <div className="flex flex-row gap-3 p-4 border rounded-full">
-              {/* <div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="outline-none">
-                    <div className="h-8 w-8 p-0 rounded-full shadow-sm border flex items-center justify-center">
-                      <PlusIcon className="h-4 w-4" />
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" alignOffset={-10}>
-                    <DropdownMenuLabel>More options</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Reset</DropdownMenuItem>
-                    <DropdownMenuItem>
-                      Attach <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div> */}
-              <AutosizeTextarea
-                className="flex-1 bg-white outline-none border-0 text-md"
-                placeholder="Respond to Nosie..."
-                minHeight={25}
-                maxHeight={55}
-                rows={1}
-                onKeyDown={(e) => handleEnter(e)}
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-              />
-              <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 256"
-                  fill="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
-                </svg>
-              </Button>
-            </div>
+              ]}
+              speed={30}
+              repeat={Infinity}
+            />
           </div>
-        </div>
+        
       </div>
+
+      <div className="h-8"></div>
+
+      <TwoCards treatmentsList={treatments} symptomList={symptoms} />
+
     </main>
   );
 }
