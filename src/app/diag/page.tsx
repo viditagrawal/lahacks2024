@@ -226,10 +226,10 @@ export default function Diagnose() {
         <main className="h-screen flex flex-col bg-background">
 
             {/* Header */}
-            <div className="flex justify-between h-20 m-4 items-center">
+            <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
                 <div>
                 <Link href="/">
-                    <img className = "w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
+                    <img className = "w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo" />
                 </Link>
                 </div>
             </div>

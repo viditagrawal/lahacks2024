@@ -235,7 +235,7 @@ export default function Chat() {
   };
 
   const handleEnter = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !loading) {
       e.preventDefault();
       sendMessage();
     }
@@ -261,7 +261,7 @@ export default function Chat() {
           <Button 
           disabled = {true}
           className="text-3xl rounded p-5 bg-primary text-white font-bold transition-colors
-          ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl">
+          ease-in-out delay-100 duration-1000 h-min w-min hover: drop-shadow-xl ">
                 Get Diagnosis
           </Button>
       )
@@ -274,7 +274,7 @@ export default function Chat() {
       <div className="flex flex-row justify-between bg-background sticky top-0 items-center">
         <div className="bg-background">
           <Link href="/">
-            <img className="w-24 h-24 m-8" src="/pathosLogo.png" alt="Logo" />
+            <img className="w-24 h-24 m-6" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
         <div className="m-6 justify-end">
@@ -284,7 +284,7 @@ export default function Chat() {
 
       {/* Conversation */}
 
-      <div className={` ${diagReady ? 'pt-32' : 'pt-0' } h-screen flex flex-col bg-background w-full p-4`}>
+      <div className={` ${diagReady ? 'pt-32' : 'pt-0' } h-screen min-w-[70%] mx-auto flex flex-col bg-background p-4`}>
         <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
           <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto pb-32">
             {conversation.map((msg, i) => (
@@ -358,12 +358,12 @@ export default function Chat() {
                   onChange={(e) => setUserInput(e.target.value)}
                 />
                 {!loading && 
-                <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
+                <Button onClick={() => sendMessage()} className="h-10 w-10 p-0 rounded-full">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 256 256"
                     fill="currentColor"
-                    className="h-4 w-4"
+                    className="h-6 w-6"
                   >
                     <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
@@ -371,12 +371,12 @@ export default function Chat() {
                   </svg>
                 </Button>}
 
-                {loading && <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full" disabled={loading}>
+                {loading && <Button onClick={() => sendMessage()} className="h-10 w-10 p-0 rounded-full" disabled={loading}>
                   <svg 
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    className={`animate-spin h-4 w-4`}
+                    className={`animate-spin h-6 w-6`}
                     stroke="currentColor"
                   >
                     {/* Example path for a spinner */}
