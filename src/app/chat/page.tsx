@@ -83,12 +83,12 @@ export default function Chat() {
       "Analyze the provided patient narrative describing their symptoms and health experiences. Identify the critical aspects of their illness story. Generate a single, clear question aimed at obtaining specific additional details or context necessary for a more precise diagnosis. This question should directly probe into aspects such as symptom patterns, potential triggers, and impacts on daily activities. Return only the question without any prefixes or additional text. \n Summary: " +
       userInput;
 
-    console.log("Question Prompt: ", prompt);
+    // console.log("Question Prompt: ", prompt);
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log(text);
+    // console.log(text);
 
     return text;
   };
@@ -100,18 +100,18 @@ export default function Chat() {
       "You are given a user's response to how much they relate to a story. Return 1 if the user agrees and relates to the story and 0 if the user disagrees and does not relate to the story. \n Response: " +
       userInput; 
 
-    console.log("Question Prompt: ", prompt);
+    // console.log("Question Prompt: ", prompt);
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("TEXT: ", text);
+    // console.log("TEXT: ", text);
 
     return text;
   };
 
   const calculateMaxDiagnose = async (userInput: string) => {
-    console.log("Calculating max diag: " + userInput);
+    // console.log("Calculating max diag: " + userInput);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     if (userInput !== '{}') {
@@ -125,7 +125,7 @@ export default function Chat() {
       const response = await result.response;
       const text = response.text();
 
-      console.log("FINAL DISEASE: ", text);
+      // console.log("FINAL DISEASE: ", text);
 
       await setDiag1(text);
       router.push("/diag");
@@ -144,7 +144,7 @@ export default function Chat() {
       await setMostRecentStory(data["text"]);
       if(shownStoryIds.size == 0)
       {
-        await addMessage({ message: "I hope you feel better soon! Someone else had a very similar story to yours where you might be able to find some help.", type: "bot" });
+        await addMessage({ message: "I hope you feel better soon! Someone else had a very similar story to yours where you might be able to find some help. Please respond if you relate or do not relate to the stories, so we can help determine your diagnosis.", type: "bot" });
       }
       else
       {
@@ -159,8 +159,8 @@ export default function Chat() {
       });
     } else {
       // Story ID has been shown before, fetch another or handle accordingly
-      console.log("Story already shown, fetching a new one or skipping...");
-      console.log(Array.from(shownStoryIds));
+      // console.log("Story already shown, fetching a new one or skipping...");
+      // console.log(Array.from(shownStoryIds));
       try {
           const endpoint = 'http://18.224.93.12:5000/fetch-response';
           const requestBody = {
@@ -179,12 +179,12 @@ export default function Chat() {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
-          console.log(data);
+          // console.log(data);
           var i = 0
           while(shownStoryIds.has(data[i].post_url))
           {
             i += 1
-            console.log(i)
+            // console.log(i)
           }
           if (data[i] && data[i].post_url) {
             await addStoryToConversation(data[i], summary);
@@ -207,12 +207,12 @@ export default function Chat() {
       " \n Conversation: \n" +
       userInput;
 
-    console.log("Summary Prompt: ", prompt);
+    // console.log("Summary Prompt: ", prompt);
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    console.log("SUMMARY: ", text);
+    // console.log("SUMMARY: ", text);
 
     return text;
   };
@@ -266,7 +266,7 @@ export default function Chat() {
 
   const updateDictionary = async (key:string, shouldIncrement:any) => {
     let temp = await Number(shouldIncrement)
-    console.log("UPDATE DICT: ", key, shouldIncrement)
+    // console.log("UPDATE DICT: ", key, shouldIncrement)
     await setPastStories(pastStories => ({
       ...pastStories,
       [key]: key in pastStories ? (temp == 1 ? pastStories[key] + 1 : pastStories[key] - 1) : (temp == 1 ? 1 : -1),
@@ -275,7 +275,7 @@ export default function Chat() {
 
   
   const sendMessage = async () => {
-    console.log(pastStories);
+    // console.log(pastStories);
     if (userInput) {
       await setLoading(true);
       await addMessage({ message: userInput, type: "user" });
@@ -409,7 +409,7 @@ export default function Chat() {
 
       {/* Conversation */}
 
-      <div className={`pt-32 h-screen min-w-[70%] justify-center flex flex-col bg-background p-4`}>
+      <div className={`pt-32 h-screen min-w-[70%] justify-start flex flex-col bg-background p-4`}>
         <ScrollArea ref={scrollRef}>
           <div className="flex flex-col gap-1 p-2 pb-32">
             {conversation.map((msg, i) => (
