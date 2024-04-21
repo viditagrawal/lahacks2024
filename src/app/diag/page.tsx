@@ -264,7 +264,7 @@ export default function Diagnose() {
 
             <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
             <div className="flex justify-center space-x-5 mt-28">
-                <p>scroll to see a graph of all story embeddings, and their corresponding diagnoses</p>
+                <p>Scroll to see a graph of all story embeddings, and their corresponding diagnoses</p>
                 {ScrollArrow()}
             </div>
             </div>
