@@ -43,6 +43,7 @@ export default function Chat() {
   const {diag2, setDiag2} = useMyContext();
   const {diagStory1, setDiagStory1} = useMyContext();
   const {diagStory2, setDiagStory2} = useMyContext();
+  const [shownStoryIds, setShownStoryIds] = useState(new Set());
 
 
   useEffect(() => {
@@ -73,6 +74,60 @@ export default function Chat() {
 
     return text;
   }
+
+  const addStoryToConversation = async (data, summary) => {
+    if (!shownStoryIds.has(data.post_url)) {
+      // Story ID not shown before, display it
+      if(shownStoryIds.size == 0)
+      {
+        await addMessage({ message: "I hope you feel better soon! Someone else had a very similar story to yours where you might be able to find some help.", type: "bot" });
+      }
+      else
+      {
+        await addMessage({ message: "Thanks for letting me know. Here is another experience someone else faced:", type: "bot" });
+      }
+      await addMessage({ message: data.text, type: "bot" });
+      await addMessageWithRedditEmbed({ message: "", type: "bot" }, data.post_url);
+      setShownStoryIds(prev => new Set([...prev, data.post_url]));  // Add to shown IDs
+    } else {
+      // Story ID has been shown before, fetch another or handle accordingly
+      console.log("Story already shown, fetching a new one or skipping...");
+      try {
+          const endpoint = 'http://18.224.93.12:5000/fetch-response';
+          const requestBody = {
+            message: summary,
+            count: shownStoryIds.size+1,
+          };
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+          })
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log(data);
+          var i = 0
+          while(shownStoryIds.has(data[i].post_url))
+          {
+            i += 1
+            console.log(i)
+          }
+          if (data[i] && data[i].post_url) {
+            await addStoryToConversation(data[i], summary);
+          } else {
+            console.error("No story ID found in the fetched data");
+          }
+      }
+      catch (error) {
+        console.log(error);
+      }
+    } 
+  };
+
 
   const summarizeConversation = async (userInput: string) => {
     const model = genAI.getGenerativeModel({ model: "gemini-pro"});
@@ -130,8 +185,7 @@ export default function Chat() {
       }
     }
   };
-
-
+  
   const sendMessage = async () => {
     if (userInput) {
       await addMessage({ message: userInput, type: "user" });
@@ -164,7 +218,8 @@ export default function Chat() {
       try {
         const endpoint = 'http://18.224.93.12:5000/fetch-response';
         const requestBody = {
-          message: summary
+          message: summary,
+          count: 1,
         };
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -185,11 +240,11 @@ export default function Chat() {
         } else {
           //console.log("found diagnosis")
           //show story or diagnosis
-          await addMessage({ message: "Oh wow! There is a similar experience that another patient has faced that may be worth checking out in order to figure out what kind of disease you have: \n " + data['text'], type: "bot" });
-          await addMessage({ message: "Here is a reddit post that might be helpful: \n ", type: "bot" });
-          console.log(data);
-
-          await addMessageWithRedditEmbed({ message: "Please let me know if this helps", type: "bot" }, data['post_url']);
+          if (data && data.post_url) {
+            await addStoryToConversation(data, summary);
+          } else {
+            console.error("No story ID found in the fetched data");
+          }
           await setDiag1(data['diagnosis']);
           await setDiagStory1(data['text']);
           if (router) {
@@ -224,7 +279,7 @@ export default function Chat() {
       {/* Conversation */}
 
       <ScrollArea ref={scrollRef} className="flex-1 overflow-x-hidden">
-        <div className="flex flex-col gap-1 p-2 max-w-3xl mx-auto">
+        <div className="flex flex-col gap-1 p-2 max-w-7xl mx-auto">
           {conversation.map((msg, i) => (
             <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} items-end`}>
               <div
@@ -240,7 +295,7 @@ export default function Chat() {
                 
                 {/* Text inside the bubble */}
                 {msg.embed ? (
-                  <RedditEmbed post_url={msg.embed}/>
+                  <RedditEmbed key={msg.embed} post_url={msg.embed}/>
                 ) : (
                   <span className="m-2 break-words overflow-hidden">{msg.message}</span>
                 )}

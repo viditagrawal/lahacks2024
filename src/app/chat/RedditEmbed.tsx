@@ -1,20 +1,25 @@
-import React from 'react';
-interface RedditEmbedProps {
-    post_url: string;  // Ensure that url is of type string
-}
+import React, { useEffect } from 'react';
 
-function RedditEmbed( {post_url}: RedditEmbedProps ) {
-    return (
-        <React.Fragment>
-            <blockquote className="reddit-embed-bq" style={{height: "316px", "data-embed-height": "316"}}>
-                <a href={post_url}>Click here to view the post</a><br />
-                by <a href="https://www.reddit.com/user/kindahipster/">u/kindahipster</a> in 
-                <a href="https://www.reddit.com/r/AskDocs/">AskDocs</a>
-            </blockquote>
-            <script async src="https://embed.reddit.com/widgets.js" charSet="UTF-8"></script>
-        </React.Fragment>
-    );
-}
+function RedditEmbed({ post_url }) {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://embed.reddit.com/widgets.js";
+    script.async = true;
+    script.charset = 'UTF-8';
+    document.body.appendChild(script);
 
+    return () => {
+      document.body.removeChild(script);
+    }
+  }, [post_url]);  // Re-run this effect if post_url changes
+
+  return (
+    <React.Fragment>
+      <blockquote className="reddit-embed-bq" style={{height: "200px"}}>
+        <a href={post_url}></a>
+      </blockquote>
+    </React.Fragment>
+  );
+}
 
 export default RedditEmbed;
