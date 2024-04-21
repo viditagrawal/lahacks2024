@@ -41,10 +41,12 @@ export default function Chat() {
   const [userInput, setUserInput] = useState("");
   const [conversation, setConversation] = useState<Message[]>([]);
 
-  const { diag1, setDiag1 } = useMyContext();
-  const { diag2, setDiag2 } = useMyContext();
-  const { diagStory1, setDiagStory1 } = useMyContext();
-  const { diagStory2, setDiagStory2 } = useMyContext();
+  const {diag1, setDiag1} = useMyContext();
+  const {diag2, setDiag2} = useMyContext();
+  const {diagStory1, setDiagStory1} = useMyContext();
+  const {diagStory2, setDiagStory2} = useMyContext();
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initialMessage = async () => {
@@ -146,6 +148,7 @@ export default function Chat() {
 
   const sendMessage = async () => {
     if (userInput) {
+      await setLoading(true);
       await addMessage({ message: userInput, type: "user" });
       setUserInput(""); // clear the textarea
 
@@ -196,6 +199,7 @@ export default function Chat() {
           let response = await generateResponse(summary);
           //console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
+          await setLoading(false);
         } else {
           //console.log("found diagnosis")
           //show story or diagnosis
@@ -235,12 +239,12 @@ export default function Chat() {
   };
 
   return (
-    <main className="h-screen w-full flex flex-col justify-center items-center bg-background">
+    <main className="max-h-screen overflow-hidden w-full flex flex-col justify-center bg-background">
       {/* Header */}
-      <div className="flex flex-col items-center">
-        <div>
+      <div className="flex flex-col sticky top-0">
+        <div className="bg-background min-w-full">
           <Link href="/">
-            <img className="w-16 h-16 m-4" src="/pathosLogo.png" alt="Logo" />
+            <img className="w-16 h-16 m-6" src="/pathosLogo.png" alt="Logo" />
           </Link>
         </div>
       </div>
@@ -265,27 +269,21 @@ export default function Chat() {
                   }`}
                 >
                   {/* Avatar inside the bubble */}
-                  {msg.type === "bot" && (
-                    <Avatar className="w-6 h-6 m-2 shrink-0">
-                      <AvatarImage src={`avatar/02.png`} />
-                      <AvatarFallback></AvatarFallback>
-                    </Avatar>
-                  )}
-
+                  {msg.type === 'bot' && <Avatar className="w-6 h-6 m-3 shrink-0">
+                    <AvatarImage src={`avatar/02.png`} />
+                    <AvatarFallback></AvatarFallback>
+                  </Avatar>}
+                  
                   {/* Text inside the bubble */}
                   {msg.embed ? (
-                    <RedditEmbed post_url={msg.embed} />
-                  ) : (
-                    <span className="m-2 break-words overflow-hidden">
-                      {msg.message}
-                    </span>
-                  )}
-                  {msg.type === "user" && (
-                    <Avatar className="w-6 h-6 m-2 shrink-0">
-                      <AvatarImage src={`avatar/01.png`} />
-                      <AvatarFallback></AvatarFallback>
-                    </Avatar>
-                  )}
+                  <RedditEmbed post_url={msg.embed}/>
+                ) : (
+                  <span className="m-2 break-words overflow-hidden">{msg.message}</span>)}
+
+                  {msg.type === 'user' && <Avatar className="w-6 h-6 m-3 shrink-0">
+                    <AvatarImage src={`avatar/01.png`} />
+                    <AvatarFallback></AvatarFallback>
+                  </Avatar>}
                 </div>
               </div>
             ))}
@@ -294,12 +292,12 @@ export default function Chat() {
         </ScrollArea>
       </div>
 
-      {/* Chat input */}
-      <div className="min-w-[70%] sm:max-w-3xl mx-auto">
-        <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
-          <div className="p-4">
-            <div className="flex flex-row gap-3 p-4 border rounded-xl">
-              {/* <div>
+        {/* Chat input */}
+        <div className="min-w-[70%] sm:max-w-3xl mx-auto">
+          <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
+            <div className="p-4">
+              <div className="flex flex-row gap-3 p-4 border rounded-xl items-center">
+                {/* <div>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="outline-none">
                       <div className="h-8 w-8 p-0 rounded-full shadow-sm border flex items-center justify-center">
@@ -316,33 +314,47 @@ export default function Chat() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div> */}
-              <AutosizeTextarea
-                className="flex-1 bg-white outline-none border-0 text-2xl"
-                placeholder="Respond to Nosie..."
-                minHeight={25}
-                maxHeight={55}
-                rows={1}
-                onKeyDown={(e) => handleEnter(e)}
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-              />
-              <Button
-                onClick={() => sendMessage()}
-                className="h-8 w-8 p-0 rounded-full"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 256 256"
-                  fill="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
-                </svg>
-              </Button>
+                <AutosizeTextarea
+                  className="flex-1 bg-white outline-none border-0 text-2xl"
+                  placeholder="Respond to Nosie..."
+                  minHeight={25}
+                  maxHeight={55}
+                  rows={1}
+                  onKeyDown={(e) => handleEnter(e)}
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                />
+                {!loading && 
+                <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 256 256"
+                    fill="currentColor"
+                    className="h-4 w-4"
+                  >
+                    <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M12 4v1M16.24 7.76l-0.7 0.7M20 12h-1M16.24 16.24l-0.7-0.7M12 20v-1M7.76 16.24l0.7-0.7M4 12h1M7.76 7.76l0.7 0.7" />
+                  </svg>
+                </Button>}
+
+                {loading && <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full" disabled={loading}>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className={`animate-spin h-4 w-4`}
+                    stroke="currentColor"
+                  >
+                    {/* Example path for a spinner */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M12 4v1M16.24 7.76l-0.7 0.7M20 12h-1M16.24 16.24l-0.7-0.7M12 20v-1M7.76 16.24l0.7-0.7M4 12h1M7.76 7.76l0.7 0.7" />
+                  </svg>
+                </Button>}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
   );
 }

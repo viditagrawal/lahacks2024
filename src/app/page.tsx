@@ -26,7 +26,7 @@ export default function Home() {
             Whatever you&apos;re feeling, <span style={{fontStyle:"italic"}}>someone has felt before too</span>.
           </p>
           <Link href="/chat" legacyBehavior>
-            <a className="bg-primary hover:bg-secondary hover:text-foreground text-white text-3xl font-bold py-3 px-4 rounded-full w-max transition-colors">
+            <a className="hover: drop-shadow-xl transition transform bg-primary animate-bounce hover:bg-secondary hover:text-foreground hover:scale-110 ease-in-out delay-100 duration-1000 hover:-translate-y-1 text-white text-3xl font-bold py-3 px-4 rounded-full w-max transition-colors">
               Let&apos;s chat
             </a>
           </Link>
