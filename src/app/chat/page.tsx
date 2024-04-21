@@ -43,6 +43,7 @@ export default function Chat() {
   const {diagStory1, setDiagStory1} = useMyContext();
   const {diagStory2, setDiagStory2} = useMyContext();
 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const initialMessage = async () => {
@@ -111,6 +112,7 @@ export default function Chat() {
 
   const sendMessage = async () => {
     if (userInput) {
+      await setLoading(true);
       await addMessage({ message: userInput, type: "user" });
       setUserInput(""); // clear the textarea
 
@@ -159,6 +161,7 @@ export default function Chat() {
           let response = await generateResponse(summary);
           //console.log("More information needed");
           await addMessage({ message: response, type: "bot" });
+          await setLoading(false);
         } else {
           //console.log("found diagnosis")
           await setDiag1(data['diagnosis']);
@@ -228,7 +231,7 @@ export default function Chat() {
         <div className="min-w-[70%] sm:max-w-3xl mx-auto">
           <div className="bg-white rounded-t-xl border-t sm:border shadow-lg">
             <div className="p-4">
-              <div className="flex flex-row gap-3 p-4 border rounded-xl">
+              <div className="flex flex-row gap-3 p-4 border rounded-xl items-center">
                 {/* <div>
                   <DropdownMenu>
                     <DropdownMenuTrigger className="outline-none">
@@ -256,6 +259,7 @@ export default function Chat() {
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
                 />
+                {!loading && 
                 <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -264,8 +268,25 @@ export default function Chat() {
                     className="h-4 w-4"
                   >
                     <path d="M200 32v144a8 8 0 0 1-8 8H67.31l34.35 34.34a8 8 0 0 1-11.32 11.32l-48-48a8 8 0 0 1 0-11.32l48-48a8 8 0 0 1 11.32 11.32L67.31 168H184V32a8 8 0 0 1 16 0Z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M12 4v1M16.24 7.76l-0.7 0.7M20 12h-1M16.24 16.24l-0.7-0.7M12 20v-1M7.76 16.24l0.7-0.7M4 12h1M7.76 7.76l0.7 0.7" />
                   </svg>
-                </Button>
+                </Button>}
+
+                {loading && <Button onClick={() => sendMessage()} className="h-8 w-8 p-0 rounded-full" disabled={loading}>
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className={`animate-spin h-4 w-4`}
+                    stroke="currentColor"
+                  >
+                    {/* Example path for a spinner */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M12 4v1M16.24 7.76l-0.7 0.7M20 12h-1M16.24 16.24l-0.7-0.7M12 20v-1M7.76 16.24l0.7-0.7M4 12h1M7.76 7.76l0.7 0.7" />
+                  </svg>
+                </Button>}
+
               </div>
             </div>
           </div>
