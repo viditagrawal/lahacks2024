@@ -236,7 +236,7 @@ export default function Diagnose() {
             <div className="content-end flex bg-background p-2 justify-center flex-end">
 
             <div className="p-2 text-3xl md:text-3xl lg:text-4xl bg-background text-center text-gray-800 content-end mr-3">
-            <p>you most likely have... </p>
+            <p>You most likely have... </p>
             </div>
         
             <div className = "p-2 rounded-3xl border-2 border-color">
