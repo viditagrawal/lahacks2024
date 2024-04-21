@@ -31,6 +31,10 @@ import Link from "next/link";
 import React from 'react';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+import { useMyContext } from "../providers";
+
+
+
 const GOOGLE_API_KEY = "AIzaSyDY2jojcob55W7G03r_-4eCs0isb5PLsNo";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || GOOGLE_API_KEY);
 
@@ -45,6 +49,7 @@ const generateResponse = async (userInput: string) => {
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
+
   console.log(text);
 
   return text;
@@ -144,13 +149,19 @@ const parseResponse = (response: string) => {
 
 export default function Diagnose() {
 
+  const {diag1, setDiag1} = useMyContext();
+  const {diag2, setDiag2} = useMyContext();
+  const {diagStory1, setDiagStory1} = useMyContext();
+  const {diagStory2, setDiagStory2} = useMyContext();
+
   const[treatments, setTreatments] = useState<string[]>([]);
   const[symptoms, setSymptoms] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await generateResponse();
+
+        const response = await generateResponse(diag1);
         console.log("Your response: " + response)
         const { treatments: newTreatments, symptoms: newSymptoms } = parseResponse(response);
 
@@ -249,7 +260,7 @@ export default function Diagnose() {
             <TypeAnimation
               sequence={[
                 // Same substring at the start will only be typed out once, initially
-                "aiddsss",
+                diag1,
                 1000,
 
               ]}

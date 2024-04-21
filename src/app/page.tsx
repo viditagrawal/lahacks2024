@@ -6,10 +6,6 @@ import { useMyContext } from "./providers";
 
 export default function Home() {
 
-  const {diag1, setDiag1} = useMyContext();
-
-  console.log(diag1)
-
   return (
     <ContextProvider>
       <main className="flex flex-row min-h-screen items-center justify-center p-24 text-center bg-gradient-to-r from-accent to-secondary">

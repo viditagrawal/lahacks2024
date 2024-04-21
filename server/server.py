@@ -28,6 +28,7 @@ load_dotenv()
 GOOGLE_API_KEY=os.getenv('GOOGLE_API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
 
+print(f"PROD: {prod}")
 
 # Print just a part of the embedding to keep the output manageable
 
