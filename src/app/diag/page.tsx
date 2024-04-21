@@ -79,10 +79,21 @@ const TwoCards: React.FC<TwoCardsProps> = ({ treatmentsList, symptomList }) => {
     }
   
     return (
-      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column-reverse' }}>
+      <div className="list-container list-disc pl-4 justify-between flex flex-col" style={{height: "80%", flexDirection: 'column' }}>
           {items.map((item, index) => (
+
             <li key={index} className="list-item text-gray-600 text-2xl">
-              {item}
+              <TypeAnimation
+              sequence={[
+                // Same substring at the start will only be typed out once, initially
+                500 * (index),
+                item,
+                1000,
+              ]}
+              speed={30}
+              repeat={Infinity}
+              cursor = {false}
+            />
             </li>
           ))}
       </div>  
@@ -249,6 +260,7 @@ export default function Diagnose() {
               ]}
               speed={30}
               repeat={Infinity}
+              cursor={false}
             />
           </div>
         
